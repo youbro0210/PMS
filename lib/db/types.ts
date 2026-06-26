@@ -42,7 +42,19 @@ export interface Profile {
   full_name: string | null;
   avatar_url: string | null;
   timezone: string;
+  is_admin: boolean;
+  created_at: string;
 }
+
+/** 역할 한글 라벨 (UI 표시용) */
+export const ROLE_LABELS: Record<MemberRole, string> = {
+  owner: "소유자",
+  manager: "관리자(PM)",
+  developer: "실무 담당",
+  designer: "설계",
+  tester: "품질/QA",
+  viewer: "열람 전용",
+};
 
 /** 프로젝트 = 건설 현장 */
 export interface Project {
@@ -254,6 +266,22 @@ export interface Database {
       seed_standard_phases: {
         Args: { p_project_id: string };
         Returns: number;
+      };
+      find_user_by_email: {
+        Args: { p_email: string };
+        Returns: { id: string; email: string; full_name: string | null }[];
+      };
+      add_project_member: {
+        Args: { p_project_id: string; p_email: string; p_role?: MemberRole };
+        Returns: string;
+      };
+      admin_list_users: {
+        Args: Record<string, never>;
+        Returns: { id: string; email: string; full_name: string | null; is_admin: boolean; created_at: string }[];
+      };
+      admin_set_user_admin: {
+        Args: { p_user_id: string; p_is_admin: boolean };
+        Returns: undefined;
       };
     };
   };

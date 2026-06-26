@@ -6,6 +6,7 @@ import {
   getCostSummary,
   getProcurementSummary,
 } from "@/lib/db/queries";
+import Link from "next/link";
 import { SiteDashboard } from "@/components/dashboard/SiteDashboard";
 import { ChatPanel } from "@/components/chat/ChatPanel";
 
@@ -31,6 +32,9 @@ export default async function SitePage({ params }: { params: Promise<{ id: strin
             {project.delivery_date ? ` · 납기 ${project.delivery_date}` : ""}
           </p>
         </div>
+        <Link href={`/projects/${id}/members`} className="ml-auto text-sm" style={{ color: "var(--accent)" }}>
+          멤버 관리
+        </Link>
       </header>
 
       <div className="flex flex-1 overflow-hidden">

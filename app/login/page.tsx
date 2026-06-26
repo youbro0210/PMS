@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -58,6 +59,9 @@ export default function LoginPage() {
         >
           {loading ? "처리 중…" : "로그인"}
         </button>
+        <p className="text-center text-xs" style={{ color: "var(--muted)" }}>
+          계정이 없으신가요? <Link href="/signup" style={{ color: "var(--accent)" }}>회원가입</Link>
+        </p>
       </form>
     </main>
   );

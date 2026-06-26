@@ -38,6 +38,16 @@ AI 경로:    브라우저 ── /api/ai/* (서버) ── Claude ── execut
 집계 뷰: `project_progress_summary`(가중 진척), `billing_summary`(누계 대금률·실수금),
 `procurement_summary`(입고율·롱리드 지연), `cost_summary`(예산 대비 집행률).
 
+## 사용자 · 권한
+
+- 회원가입(`/signup`) → Supabase Auth, 가입 시 `profiles` 자동 생성(트리거).
+- 프로젝트 역할(6단계): 소유자 / 관리자(PM) / 실무 담당 / 설계 / 품질·QA / 열람 전용.
+  RLS가 역할별 접근을 강제(예: 열람 전용은 쓰기 불가, 삭제는 소유자·관리자만).
+- 멤버 관리(`/projects/[id]/members`): 이메일로 초대(`add_project_member` RPC, 권한 검증),
+  역할 변경·삭제. 초대 대상은 먼저 회원가입돼 있어야 한다.
+- 시스템 관리자(`profiles.is_admin`): 전체 프로젝트·사용자 접근(`/admin`). 최초 관리자는
+  `0007` 주석대로 `update profiles set is_admin=true where email='...'` 한 번 실행해 지정.
+
 ## AI 명령 예시
 
 | 입력 | tool | 동작 |
@@ -55,10 +65,12 @@ AI 경로:    브라우저 ── /api/ai/* (서버) ── Claude ── execut
 
 ```
 app/
-  login/                  로그인
-  page.tsx                현장(프로젝트) 목록 + 신규 등록 버튼
-  projects/new/           신규 현장 등록(기본·계약·정산 + 표준 공종 시드)
-  projects/[id]/board/    현장 대시보드 + AI 어시스턴트 패널
+  login/  signup/         로그인 · 회원가입
+  admin/                  시스템 관리자(전체 사용자·관리자 권한 토글)
+  page.tsx                수주 목록 + 신규 등록 버튼
+  projects/new/           신규 수주 등록(제품·계약·납기 + 표준 단계 시드)
+  projects/[id]/board/    수주 대시보드 + AI 어시스턴트 패널
+  projects/[id]/members/  멤버·권한 관리(이메일 초대·역할 변경·삭제)
   api/ai/command/         자연어 명령 엔드포인트
 lib/
   supabase/               server / client / admin 클라이언트
