@@ -10,7 +10,7 @@
 ### A. Supabase (권장 — 관리형 PostgreSQL)
 - Supabase 프로젝트 = PostgreSQL 인스턴스 + Auth + Storage + 자동 백업.
 - RLS 정책이 `auth.uid()`(Supabase Auth)에 의존하므로 가장 적은 설정으로 동작한다.
-- 적용 방법 ① SQL Editor에 `0001 → 0002 → 0003 → 0004 → 0005` 순서로 붙여넣어 실행.
+- 적용 방법 ① SQL Editor에 `0001 → 0002 → … → 0006` 순서로 붙여넣어 실행.
 - 적용 방법 ② psql 한 번에:
   ```bash
   export DATABASE_URL="postgres://...supabase.co:5432/postgres"  # Database > Connection string

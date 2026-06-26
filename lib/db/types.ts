@@ -19,13 +19,21 @@ export type BillingStatus = "draft" | "requested" | "reviewed" | "confirmed" | "
 
 export type CostCategory = "labor" | "material" | "subcontract" | "equipment" | "expense";
 
-export type InspectionType = "safety" | "quality";
+export type InspectionType = "safety" | "quality" | "fat";
 export type InspectionResult = "pass" | "conditional" | "fail";
+
+export type ProductType =
+  | "compressor" | "booster" | "purifier" | "diesel_power"
+  | "electric_heater" | "filter_valve" | "module" | "other";
+
+export type ProcurementStatus =
+  | "planned" | "ordered" | "in_transit" | "received" | "inspected";
 
 export type AiIntent =
   | "get_progress_summary" | "update_progress"
   | "get_billing_status" | "record_billing"
   | "get_cost_summary" | "log_inspection"
+  | "record_procurement" | "get_procurement_status"
   | "search" | "unknown";
 
 export interface Profile {
@@ -54,6 +62,11 @@ export interface Project {
   advance_payment: number;            // 선급금 총액
   advance_recovery_rate: number;      // 선급금 정산율(%)
   retention_rate: number;             // 기성 유보율(%)
+  order_no: string | null;            // 수주번호
+  product_type: ProductType | null;   // 제품 유형
+  end_user: string | null;            // 최종 납품처
+  delivery_date: string | null;       // 납기(출하 예정일)
+  serial_no: string | null;
   color: string;
   icon: string;
   created_at: string;
@@ -139,6 +152,26 @@ export interface Inspection {
   is_closed: boolean;
 }
 
+export interface ProcurementItem {
+  id: string;
+  project_id: string;
+  vendor_id: string | null;
+  work_package_id: string | null;
+  name: string;
+  spec: string | null;
+  qty: number;
+  unit: string;
+  amount: number;
+  po_no: string | null;
+  order_date: string | null;
+  lead_time_weeks: number | null;
+  eta: string | null;
+  received_date: string | null;
+  is_long_lead: boolean;
+  status: ProcurementStatus;
+  created_at: string;
+}
+
 export interface AiActionLog {
   id: string;
   user_id: string | null;
@@ -170,6 +203,7 @@ export interface Database {
       billings: { Row: Billing; Insert: Insertable<Billing, "project_id" | "period_no">; Update: Partial<Billing> };
       cost_entries: { Row: CostEntry; Insert: Insertable<CostEntry, "project_id" | "category" | "amount">; Update: Partial<CostEntry> };
       inspections: { Row: Inspection; Insert: Insertable<Inspection, "project_id" | "type">; Update: Partial<Inspection> };
+      procurement_items: { Row: ProcurementItem; Insert: Insertable<ProcurementItem, "project_id" | "name">; Update: Partial<ProcurementItem> };
       ai_action_logs: { Row: AiActionLog; Insert: Insertable<AiActionLog, "input_text">; Update: Partial<AiActionLog> };
     };
     Views: {
@@ -184,6 +218,9 @@ export interface Database {
       };
       cost_by_category: {
         Row: { project_id: string; category: CostCategory; total: number };
+      };
+      procurement_summary: {
+        Row: { project_id: string; item_count: number; received_count: number; long_lead_count: number; long_lead_overdue: number; received_rate: number | null; procurement_total: number | null };
       };
     };
     Functions: {
@@ -203,10 +240,18 @@ export interface Database {
           p_retention_rate?: number | null;
           p_description?: string | null;
           p_icon?: string | null;
+          p_order_no?: string | null;
+          p_product_type?: string | null;
+          p_end_user?: string | null;
+          p_delivery_date?: string | null;
         };
         Returns: string; // 생성된 project id
       };
       seed_standard_works: {
+        Args: { p_project_id: string };
+        Returns: number;
+      };
+      seed_standard_phases: {
         Args: { p_project_id: string };
         Returns: number;
       };

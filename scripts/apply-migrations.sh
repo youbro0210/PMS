@@ -18,4 +18,4 @@ for f in "$DIR"/0*.sql; do
   echo "▶ 적용: $(basename "$f")"
   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"
 done
-echo "✓ 모든 마이그레이션 적용 완료 (0001 → 0005)"
+echo "✓ 모든 마이그레이션 적용 완료 (0001 → 0006)"

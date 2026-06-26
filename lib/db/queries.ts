@@ -62,3 +62,13 @@ export async function getCostSummary(projectId: string) {
     .maybeSingle();
   return data;
 }
+
+export async function getProcurementSummary(projectId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("procurement_summary")
+    .select("*")
+    .eq("project_id", projectId)
+    .maybeSingle();
+  return data;
+}

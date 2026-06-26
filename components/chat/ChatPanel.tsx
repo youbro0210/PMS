@@ -67,7 +67,7 @@ export function ChatPanel({ projectId }: { projectId: string }) {
       <div className="flex-1 space-y-3 overflow-y-auto p-3">
         {messages.length === 0 && (
           <p className="text-xs" style={{ color: "var(--muted)" }}>
-            예: &quot;철근콘크리트 공정률 65%로 갱신해줘&quot; · &quot;3회차 기성 2억5천 등록해줘&quot;
+            예: &quot;상세설계 진척 70%로 갱신해줘&quot; · &quot;NEA 압축기 본체 롱리드로 발주 등록&quot;
           </p>
         )}
         {messages.map((m, i) => (

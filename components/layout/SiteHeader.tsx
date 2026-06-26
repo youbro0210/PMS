@@ -11,11 +11,11 @@ export function SiteHeader() {
         SYU<span style={{ color: "var(--accent)" }}>·</span>PMS
       </Link>
       <nav className="flex items-center gap-7 text-sm" style={{ color: "var(--text)" }}>
-        <Link href="/">현장</Link>
-        <span style={{ color: "var(--muted)" }}>공정</span>
-        <span style={{ color: "var(--muted)" }}>기성</span>
-        <span style={{ color: "var(--muted)" }}>원가</span>
-        <span style={{ color: "var(--muted)" }}>안전</span>
+        <Link href="/">수주</Link>
+        <span style={{ color: "var(--muted)" }}>단계</span>
+        <span style={{ color: "var(--muted)" }}>대금</span>
+        <span style={{ color: "var(--muted)" }}>구매</span>
+        <span style={{ color: "var(--muted)" }}>FAT</span>
       </nav>
     </header>
   );

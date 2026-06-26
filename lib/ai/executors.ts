@@ -96,6 +96,8 @@ export async function executeTool(name: string, input: ToolInput, ctx: ExecutorC
     case "record_billing": return recordBilling(input, ctx);
     case "get_cost_summary": return getCostSummary(ctx);
     case "log_inspection": return logInspection(input, ctx);
+    case "record_procurement": return recordProcurement(input, ctx);
+    case "get_procurement_status": return getProcurementStatus(ctx);
     case "search": return search(input, ctx);
     default: return { ok: false, reason: "error", message: `알 수 없는 도구: ${name}` };
   }
@@ -260,6 +262,64 @@ async function logInspection(input: ToolInput, ctx: ExecutorContext): Promise<Ex
 
   const label = input.type === "safety" ? "안전" : "품질";
   return { ok: true, data: { inspection: data }, message: `${label} 점검 결과를 기록했습니다.` };
+}
+
+async function recordProcurement(input: ToolInput, ctx: ExecutorContext): Promise<ExecutorResult> {
+  const denied = await requireEditor(ctx);
+  if (denied) return denied;
+
+  let vendorId: string | null = null;
+  if (typeof input.vendor_name === "string") {
+    const v = await resolveSub(ctx, input.vendor_name);
+    vendorId = v?.id ?? null;
+  }
+
+  const status = (input.status as string) ?? "ordered";
+  const lead = input.lead_time_weeks != null ? Number(input.lead_time_weeks) : null;
+  const eta = lead != null ? new Date(Date.now() + lead * 7 * 86400000).toISOString().slice(0, 10) : null;
+
+  const { data, error } = await ctx.db
+    .from("procurement_items")
+    .insert({
+      project_id: ctx.projectId,
+      vendor_id: vendorId,
+      name: input.name as string,
+      amount: input.amount != null ? Number(input.amount) : 0,
+      lead_time_weeks: lead,
+      eta,
+      is_long_lead: Boolean(input.is_long_lead),
+      status: status as "planned" | "ordered" | "in_transit" | "received" | "inspected",
+      order_date: status === "ordered" ? new Date().toISOString().slice(0, 10) : null,
+      received_date: status === "received" || status === "inspected" ? new Date().toISOString().slice(0, 10) : null,
+      created_by: ctx.userId,
+    } as never)
+    .select()
+    .single();
+  if (error) return { ok: false, reason: "error", message: error.message };
+
+  return {
+    ok: true,
+    data: { item: data },
+    message: `기자재 '${input.name}'을(를) 등록했습니다.${eta ? ` 입고예정 ${eta}.` : ""}${input.is_long_lead ? " (롱리드 임계경로)" : ""}`,
+  };
+}
+
+async function getProcurementStatus(ctx: ExecutorContext): Promise<ExecutorResult> {
+  const { data, error } = await ctx.db
+    .from("procurement_summary")
+    .select("*")
+    .eq("project_id", ctx.projectId)
+    .maybeSingle();
+  if (error) return { ok: false, reason: "error", message: error.message };
+
+  const { data: overdue } = await ctx.db
+    .from("procurement_items")
+    .select("name, eta, status")
+    .eq("project_id", ctx.projectId)
+    .eq("is_long_lead", true)
+    .not("status", "in", "(received,inspected)");
+
+  return { ok: true, data: { summary: data ?? { item_count: 0 }, long_lead: overdue ?? [] }, message: "기자재 구매 현황을 조회했습니다." };
 }
 
 async function search(input: ToolInput, ctx: ExecutorContext): Promise<ExecutorResult> {

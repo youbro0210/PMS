@@ -3,38 +3,34 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>SYU·PMS — 건설 현장 관리 데모</title>
+<title>MnSi·PMS — 수주 제조 관리 데모</title>
 <style>
-:root{--bg:#f4f6fa;--surface:#fff;--surface2:#f8fafc;--border:#e3e8f1;--text:#16203a;--muted:#6b7689;--navy:#1b2a63;--navy2:#14225a;--accent:#2f6bd8;--soft:#eaf1fc;--ok:#1d9e75;--warn:#e09017;--danger:#d93a3a}
+:root{--bg:#f4f6fa;--surface:#fff;--surface2:#f8fafc;--border:#e3e8f1;--text:#16203a;--muted:#6b7689;--navy:#1b2a63;--accent:#2f6bd8;--soft:#eaf1fc;--ok:#1d9e75;--warn:#e09017;--danger:#d93a3a}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Malgun Gothic",sans-serif}
-.wrap{max-width:1200px;margin:0 auto;min-height:100vh;background:var(--bg);display:flex;flex-direction:column}
+.wrap{max-width:1240px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
 .nav{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border-bottom:1px solid var(--border);padding:12px 22px}
-.logo{font-style:italic;font-weight:800;letter-spacing:-1px;color:var(--navy);font-size:22px}
-.logo b{color:var(--accent);font-style:normal}
-.nav .menu{display:flex;gap:26px;font-size:14px}
-.nav .menu span{color:var(--muted)}.nav .menu .on{color:var(--text);font-weight:600}
-.hero{background:linear-gradient(120deg,rgba(20,34,90,.95),rgba(27,42,99,.78)),linear-gradient(180deg,#2a3c7a,#1b2a63);color:#fff;padding:22px 22px}
-.hero .t1{font-size:12px;opacity:.8}.hero .t2{font-size:19px;font-weight:700;margin-top:4px}.hero .t3{font-size:12px;opacity:.85;margin-top:6px}
+.logo{font-weight:700;letter-spacing:-.5px;color:var(--navy);font-size:21px}
+.logo b{color:var(--accent)}
+.nav .menu{display:flex;gap:24px;font-size:14px}.nav .menu span{color:var(--muted)}.nav .menu .on{color:var(--text);font-weight:600}
+.hero{background:linear-gradient(120deg,rgba(20,34,90,.95),rgba(27,42,99,.78)),linear-gradient(180deg,#2a3c7a,#1b2a63);color:#fff;padding:18px 22px}
+.hero .t2{font-size:18px;font-weight:700;margin-top:3px}
 .main{flex:1;display:flex;overflow:hidden}
-.dash{flex:1;overflow-y:auto;padding:20px}
-.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
-.metric{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:15px 17px}
-.metric .l{font-size:12px;color:var(--muted)}
-.metric .v{font-size:25px;font-weight:700;color:var(--navy);margin-top:4px}
-.metric .s{font-size:12px;margin-top:4px;color:var(--muted)}
-h2{font-size:14px;font-weight:600;color:var(--navy);margin:0 0 12px}
-.row{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:9px;transition:.15s}
+.dash{flex:1;overflow-y:auto;padding:18px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:13px 15px}
+.metric .l{font-size:12px;color:var(--muted)}.metric .v{font-size:22px;font-weight:700;color:var(--navy);margin-top:3px}.metric .s{font-size:11px;margin-top:3px;color:var(--muted)}
+.cols{display:grid;grid-template-columns:1.1fr 1fr;gap:16px}
+h2{font-size:13px;font-weight:600;color:var(--navy);margin:0 0 10px}
+.row{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:9px 12px;margin-bottom:7px;transition:.15s}
 .row.flash{border-color:var(--accent);box-shadow:0 0 0 3px var(--soft)}
-.row .top{display:flex;justify-content:space-between;font-size:13px;margin-bottom:9px}
-.row .top .m{color:var(--muted)}
-.bar{position:relative;height:8px;border-radius:5px;background:#eef1f6;overflow:hidden}
-.bar i{position:absolute;left:0;top:0;height:8px;border-radius:5px}
-.row .b{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:5px}
-aside{width:392px;flex:0 0 auto;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column}
+.bar{position:relative;height:7px;border-radius:5px;background:#eef1f6;overflow:hidden}
+.bar i{position:absolute;left:0;top:0;height:7px;border-radius:5px}
+.badge{font-size:10px;padding:1px 8px;border-radius:10px;border:1px solid var(--border)}
+aside{width:380px;flex:0 0 auto;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column}
 aside .hd{padding:13px 15px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:8px}
 aside .hd small{margin-left:auto;color:var(--muted);font-weight:400}
-.log{flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:11px;background:var(--surface2)}
+.log{flex:1;overflow-y:auto;padding:15px;display:flex;flex-direction:column;gap:10px;background:var(--surface2)}
 .bub{max-width:88%;padding:9px 12px;border-radius:12px;font-size:13px;line-height:1.55}
 .bub.u{align-self:flex-end;background:var(--accent);color:#fff}
 .bub.a{align-self:flex-start;background:var(--surface);border:1px solid var(--border)}
@@ -45,33 +41,28 @@ form{display:flex;gap:8px;padding:13px 15px;border-top:1px solid var(--border)}
 input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px 12px;font-size:13px}
 input:focus{outline:none;border-color:var(--accent)}
 button.send{background:var(--accent);border:0;color:#fff;border-radius:8px;width:44px;font-size:16px;cursor:pointer}
-.tag{font-size:11px;padding:2px 9px;border-radius:14px;background:rgba(29,158,117,.12);color:#157a59}
 ::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:#d3dae6;border-radius:5px}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="nav">
-    <div class="logo">SYU<b>·</b>PMS</div>
-    <div class="menu"><span class="on">현장</span><span>공정</span><span>기성</span><span>원가</span><span>안전</span></div>
-  </div>
-  <div class="hero">
-    <div class="t1">한강 푸르지오 신축공사 · 발주처 한강도시공사 · 건축</div>
-    <div class="t2">도급액 320억 · 선급금 32억(10%) · 유보율 3%</div>
-    <div class="t3">공정률·기성·실행예산·안전을 자연어로 관리합니다.</div>
-  </div>
+  <div class="nav"><div class="logo">MnSi<b>·</b>PMS</div><div class="menu"><span class="on">수주</span><span>단계</span><span>대금</span><span>구매</span><span>FAT</span></div></div>
+  <div class="hero"><div style="font-size:12px;opacity:.85">창원 수소충전소 압축기 패키지 · 고객 한울에너지 · 납품처 창원 수소충전소</div><div class="t2">압축기 유닛(4,000bar급) · 계약 18억 · 납기 2026-12-20</div></div>
   <div class="main">
     <div class="dash">
       <div class="metrics">
-        <div class="metric"><div class="l">공정률 (실적/계획)</div><div class="v"><span id="pa">0</span>% <span style="font-size:14px;color:var(--muted)">/ <span id="pp">0</span>%</span></div><div class="s" id="pv"></div></div>
-        <div class="metric"><div class="l">누계 기성률</div><div class="v"><span id="br">0</span>%</div><div class="s" id="bs"></div></div>
+        <div class="metric"><div class="l">단계 진척 (실/계)</div><div class="v"><span id="pa">0</span>/<span id="pp">0</span>%</div><div class="s" id="pv"></div></div>
+        <div class="metric"><div class="l">누계 대금률</div><div class="v"><span id="br">0</span>%</div><div class="s" id="bs"></div></div>
+        <div class="metric"><div class="l">기자재 입고율</div><div class="v"><span id="ir">0</span>%</div><div class="s" id="is"></div></div>
         <div class="metric"><div class="l">원가 집행률</div><div class="v"><span id="cr">0</span>%</div><div class="s" id="cs"></div></div>
       </div>
-      <h2>공종별 진행</h2>
-      <div id="works"></div>
+      <div class="cols">
+        <div><h2>단계별 진척</h2><div id="phases"></div></div>
+        <div><h2>기자재 구매 (롱리드 추적)</h2><div id="proc"></div></div>
+      </div>
     </div>
     <aside>
-      <div class="hd">현장 AI 어시스턴트 <small>claude-haiku-4-5 · tool use</small></div>
+      <div class="hd">수주 AI 어시스턴트 <small>claude-haiku-4-5</small></div>
       <div class="log" id="log"></div>
       <div class="chips" id="chips"></div>
       <form id="form"><input id="input" placeholder="자연어로 명령하세요" autocomplete="off"/><button class="send" type="submit">↑</button></form>
@@ -79,53 +70,59 @@ button.send{background:var(--accent);border:0;color:#fff;border-radius:8px;width
   </div>
 </div>
 <script>
-const works=[
- {c:"02-100",n:"토공사",w:8,pl:100,ac:100,s:"완료",sub:"대한토건"},
- {c:"03-200",n:"철근콘크리트(골조)",w:30,pl:70,ac:58,s:"진행 중",sub:"신성건설"},
- {c:"04-300",n:"조적/미장",w:10,pl:40,ac:35,s:"진행 중",sub:"동양건업"},
- {c:"05-400",n:"방수공사",w:6,pl:50,ac:45,s:"진행 중",sub:"방수ENG"},
- {c:"07-500",n:"창호/유리",w:8,pl:20,ac:10,s:"진행 중",sub:"거산창호"},
- {c:"08-600",n:"마감/인테리어",w:18,pl:10,ac:5,s:"진행 중",sub:"우리인테리어"},
- {c:"09-700",n:"기계설비",w:10,pl:30,ac:22,s:"진행 중",sub:"삼정설비"},
- {c:"10-800",n:"전기/통신",w:10,pl:30,ac:25,s:"진행 중",sub:"한빛전기"}
+const ph=[
+ {c:"P1",n:"수주/계약",w:5,pl:100,ac:100},{c:"P2",n:"기본·상세설계",w:20,pl:80,ac:72},
+ {c:"P3",n:"구매/자재조달",w:15,pl:60,ac:40},{c:"P4",n:"제작/가공",w:25,pl:30,ac:18},
+ {c:"P5",n:"조립/패키징",w:15,pl:10,ac:3},{c:"P6",n:"FAT(공장시험)",w:10,pl:0,ac:0},
+ {c:"P7",n:"출하/납품",w:5,pl:0,ac:0},{c:"P8",n:"설치/시운전",w:5,pl:0,ac:0}
 ];
-const CONTRACT=32000000000,RETENTION=0.03,ADVANCE_RATE=0.10;
-let billing={period:2,cum:11520000000,retention:345600000,net:9907200000};
-const budget=28800000000;let cost=10500000000;let inspections=[];
-const log=document.getElementById("log");
-const round=(x,d)=>{const m=Math.pow(10,d||0);return Math.round(x*m)/m};
-const eok=n=>round(n/1e8,1)+"억";
-const weighted=k=>{let s=0,wt=0;works.forEach(w=>{s+=w.w*w[k];wt+=w.w});return round(s/wt,1)};
-const $=id=>document.getElementById(id);
+const PS={planned:["발주예정","var(--muted)"],ordered:["발주","var(--accent)"],in_transit:["운송중","var(--warn)"],received:["입고","var(--ok)"],inspected:["검사완료","var(--ok)"]};
+let proc=[
+ {n:"NEA 다이어프램 압축기 본체",v:"NEA(독일)",ll:true,st:"in_transit",eta:"2026-09-30",amt:7.2e8},
+ {n:"토출 밸브 어셈블리",v:"거산밸브",ll:false,st:"received",eta:"2026-06-10",amt:0.6e8},
+ {n:"전기 히터 모듈",v:"한빛전기",ll:false,st:"ordered",eta:"2026-08-05",amt:0.4e8},
+ {n:"계장·안전밸브 SET",v:"미정",ll:false,st:"planned",eta:null,amt:0.3e8}
+];
+const CONTRACT=18e8,RET=0.05,ADV=0.10;
+let bill={period:1,cum:5.4e8,retention:0.27e8,net:4.59e8};const budget=15e8;let cost=4.2e8;let insp=[];
+const log=document.getElementById("log"),$=id=>document.getElementById(id);
+const round=(x,d)=>{const m=Math.pow(10,d||0);return Math.round(x*m)/m},eok=n=>round(n/1e8,2)+"억";
+const weighted=k=>{let s=0,w=0;ph.forEach(p=>{s+=p.w*p[k];w+=p.w});return round(s/w,1)};
+const today=new Date("2026-07-01");
+const recRate=()=>{const r=proc.filter(p=>p.st==="received"||p.st==="inspected").length;return{r,rate:round(r/proc.length*100,0)}};
+const llOver=()=>proc.filter(p=>p.ll&&p.st!=="received"&&p.st!=="inspected"&&p.eta&&new Date(p.eta)<today).length;
 function refresh(){
  const pa=weighted("ac"),pp=weighted("pl"),v=round(pa-pp,1);
  $("pa").textContent=pa;$("pp").textContent=pp;$("pv").textContent=v>=0?"+"+v+"%p 선행":v+"%p 지연";$("pv").style.color=v>=0?"var(--ok)":"var(--danger)";
- const b=round(billing.cum/CONTRACT*100,1);$("br").textContent=b;$("bs").textContent=billing.period+"회차 · 실지급 "+eok(billing.net)+" · 유보 "+eok(billing.retention);
- const c=round(cost/budget*100,1);$("cr").textContent=c;$("cs").textContent=eok(cost)+" / "+eok(budget);
- $("works").innerHTML=works.map((w,i)=>{const lead=w.ac>=w.pl;return `<div class="row" id="w${i}"><div class="top"><span><span class="m" style="margin-right:6px">${w.c}</span>${w.n}</span><span class="m">${w.sub} · ${w.s} · 가중 ${w.w}%</span></div><div class="bar"><i style="width:${Math.min(100,w.pl)}%;background:#c7d2e6"></i><i style="width:${Math.min(100,w.ac)}%;background:${lead?'var(--ok)':'var(--warn)'}"></i></div><div class="b"><span>실적 ${w.ac}%</span><span>계획 ${w.pl}%</span></div></div>`}).join("");
+ $("br").textContent=round(bill.cum/CONTRACT*100,0);$("bs").textContent=bill.period+"회차 · 실수금 "+eok(bill.net);
+ const rr=recRate(),lo=llOver();$("ir").textContent=rr.rate;$("is").textContent=rr.r+"/"+proc.length+"건 · 롱리드지연 "+lo;$("is").style.color=lo>0?"var(--danger)":"var(--muted)";
+ $("cr").textContent=round(cost/budget*100,0);$("cs").textContent=eok(cost)+" / "+eok(budget);
+ $("phases").innerHTML=ph.map((p,i)=>{const lead=p.ac>=p.pl;return `<div class="row" id="ph${i}"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span><span style="color:var(--muted);margin-right:5px">${p.c}</span>${p.n}</span><span style="color:var(--muted)">${p.ac}/${p.pl}% · 가중${p.w}</span></div><div class="bar"><i style="width:${p.pl}%;background:#c7d2e6"></i><i style="width:${p.ac}%;background:${lead?'var(--ok)':'var(--warn)'}"></i></div></div>`}).join("");
+ $("proc").innerHTML=proc.map((p,i)=>{const s=PS[p.st];return `<div class="row" id="pr${i}"><div style="display:flex;justify-content:space-between;font-size:12px;gap:6px"><span>${p.ll?'⚠ ':''}${p.n}</span><span class="badge" style="color:${s[1]}">${s[0]}</span></div><div style="font-size:11px;color:var(--muted);margin-top:3px">${p.v}${p.eta?' · ETA '+p.eta:''}${p.amt?' · '+eok(p.amt):''}</div></div>`}).join("");
 }
 function say(role,html){const b=document.createElement("div");b.className="bub "+(role==="user"?"u":"a");b.innerHTML=html;log.appendChild(b);log.scrollTop=log.scrollHeight}
-function flash(i){const el=$("w"+i);if(el){el.classList.add("flash");setTimeout(()=>el.classList.remove("flash"),1500)}}
-function findWork(t){let bi=-1,bs=0;works.forEach((w,i)=>{let sc=0;[w.n,w.c].concat(w.n.split(/[\/()]/)).forEach(tok=>{tok=tok.trim();if(tok.length>1&&t.includes(tok))sc=Math.max(sc,tok.length)});if(sc>bs){bs=sc;bi=i}});return bi}
-function parseWon(t){t=t.replace(/[,\s]/g,"");let v=0,m;m=t.match(/(\d+)억/);if(m)v+=+m[1]*1e8;m=t.match(/억(\d+)천/);if(m)v+=+m[1]*1e7;else{m=t.match(/(\d+)천만/);if(m)v+=+m[1]*1e7}m=t.match(/(\d+)백만/);if(m)v+=+m[1]*1e6;m=t.match(/(\d+)만원?/);if(m&&v===0)v+=+m[1]*1e4;if(v===0){m=t.match(/(\d{6,})/);if(m)v=+m[1]}return v}
+function flashP(i){const el=$("ph"+i);if(el){el.classList.add("flash");setTimeout(()=>el.classList.remove("flash"),1400)}}
+function flashR(i){const el=$("pr"+i);if(el){el.classList.add("flash");setTimeout(()=>el.classList.remove("flash"),1400)}}
+function findPhase(t){let bi=-1,bs=0;ph.forEach((p,i)=>{[p.n,p.c].concat(p.n.split(/[\/()]/)).forEach(tok=>{tok=tok.trim();if(tok.length>1&&t.includes(tok)&&tok.length>bs){bs=tok.length;bi=i}})});return bi}
+function findProc(t){let bi=-1,bs=0;proc.forEach((p,i)=>{p.n.split(/[\s·]/).forEach(tok=>{if(tok.length>1&&t.includes(tok)&&tok.length>bs){bs=tok.length;bi=i}})});return bi}
+function parseWon(t){t=t.replace(/[,\s]/g,"");let v=0,m;m=t.match(/(\d+)억/);if(m)v+=+m[1]*1e8;m=t.match(/억(\d+)천/);if(m)v+=+m[1]*1e7;else{m=t.match(/(\d+)천만/);if(m)v+=+m[1]*1e7}if(v===0){m=t.match(/(\d{6,})/);if(m)v=+m[1]}return v}
 function handle(text){
  say("user",text);
- let pm=text.match(/(\d+(?:\.\d+)?)\s*%/)||text.match(/공정률\D*(\d+)/);
- if(/공정률|진척|진도/.test(text)&&pm&&/갱신|업데이트|변경|올려|으로|로 |처리|입력|등록/.test(text)){const i=findWork(text);if(i<0)return say("a",'어떤 공종인지 찾지 못했습니다.');const r=Math.max(0,Math.min(100,+pm[1]));works[i].ac=r;works[i].s=r>=100?"완료":r>0?"진행 중":"미착수";refresh();flash(i);return say("a",`✓ '<b>${works[i].n}</b>' 실적 공정률을 ${r}%로 갱신했습니다. 현장 전체 공정률 ${weighted("ac")}%.`)}
- if(/기성/.test(text)&&/등록|청구|올려|기록|반영/.test(text)){const amt=parseWon(text);if(!amt)return say("a",'기성 금액을 인식하지 못했습니다. 예: "3회차 기성 2억5천 등록".');const ret=Math.round(amt*RETENTION),adv=Math.round(amt*ADVANCE_RATE),net=amt-ret-adv;billing.period+=1;billing.cum+=amt;billing.retention+=ret;billing.net+=net;refresh();return say("a",`🧾 ${billing.period}회차 기성 <b>${eok(amt)}</b> 청구.<br>유보 ${eok(ret)}(3%)·선급금정산 ${eok(adv)}(10%) 차감 → <b>실지급 ${eok(net)}</b><br>누계 기성 ${eok(billing.cum)} · 기성률 ${round(billing.cum/CONTRACT*100,1)}%<br><span style="font-size:11px;color:var(--muted)">상태: 청구 → 사정 → 확정 → 지급</span>`)}
- if(/안전|품질/.test(text)&&/점검|지적|불합격|합격|확인/.test(text)){const ty=/품질/.test(text)?"품질":"안전";const res=/불합격|미설치|미흡|위반|불량/.test(text)?["불합격","var(--danger)"]:/조건부/.test(text)?["조건부","var(--warn)"]:["합격","var(--ok)"];inspections.push({ty,res:res[0]});const open=inspections.filter(x=>x.res!=="합격").length;return say("a",`📋 ${ty} 점검 기록: <b style="color:${res[1]}">${res[0]}</b>. ${res[0]!=="합격"?`시정 대상 등록(미조치 ${open}건).`:"이상 없음."}`)}
- if(/원가|실행예산|집행|비용/.test(text)&&/현황|얼마|알려|요약|어때/.test(text)){return say("a",`💰 <b>원가 집행 현황</b><br>실행예산 ${eok(budget)} · 집행 ${eok(cost)} (집행률 ${round(cost/budget*100,1)}%) · 잔액 ${eok(budget-cost)}<br><span style="font-size:11px;color:var(--muted)">노무 42억·자재 38억·외주 18억·장비 4억·경비 3억</span>`)}
- if(/기성/.test(text)&&/현황|얼마|알려|요약|어때|상태/.test(text)){return say("a",`🧾 <b>기성 현황</b><br>최근 ${billing.period}회차 · 누계 ${eok(billing.cum)} / 도급 ${eok(CONTRACT)} · 기성률 ${round(billing.cum/CONTRACT*100,1)}%<br>누계 유보 ${eok(billing.retention)} · 누계 실지급 ${eok(billing.net)} · 선급금 잔액 ${eok(32e8-(billing.cum*ADVANCE_RATE))}`)}
- if(/공정|진척|진도|현황|요약/.test(text)){const pa=weighted("ac"),pp=weighted("pl"),v=round(pa-pp,1);const late=works.filter(w=>w.ac<w.pl).sort((a,b)=>(a.ac-a.pl)-(b.ac-b.pl)).slice(0,3);return say("a",`📊 <b>공정 현황</b><br>실적 ${pa}% / 계획 ${pp}% (${v>=0?"+"+v:v}%p)<br>지연 공종: ${late.map(w=>w.n+`(${round(w.ac-w.pl,1)}%p)`).join(", ")||"없음"}`)}
- if(/찾아|검색|어디|누구/.test(text)){const q=text.replace(/공종|협력사|업체|찾아줘?|검색해?줘?|알려줘?/g,"").trim();const r=works.filter(w=>w.n.includes(q)||w.sub.includes(q)||q.includes(w.sub));if(!r.length)return say("a","검색 결과가 없습니다.");return say("a",`🔍 ${r.length}건:<br>${r.map(w=>`· ${w.n} — ${w.sub} (실적 ${w.ac}%)`).join("<br>")}`)}
- say("a",'명령을 이해하지 못했습니다. 공정률 갱신 · 기성 등록 · 공정/기성/원가 현황 · 안전점검을 시도해 보세요.');
+ let pm=text.match(/(\d+(?:\.\d+)?)\s*%/)||text.match(/진척\D*(\d+)/);
+ if(/진척|진행률|설계|제작|구매|조립/.test(text)&&pm&&/갱신|업데이트|변경|올려|으로|로 |처리|입력/.test(text)){const i=findPhase(text);if(i<0)return say("a",'어떤 단계인지 찾지 못했습니다.');const r=Math.max(0,Math.min(100,+pm[1]));ph[i].ac=r;refresh();flashP(i);return say("a",`✓ '<b>${ph[i].n}</b>' 진척을 ${r}%로 갱신. 전체 진척 ${weighted("ac")}%.`)}
+ if(/입고/.test(text)){const i=findProc(text);if(i<0)return say("a",'어떤 품목인지 찾지 못했습니다.');proc[i].st="received";refresh();flashR(i);return say("a",`📦 '<b>${proc[i].n}</b>' 입고 처리. 입고율 ${recRate().rate}%.`)}
+ if(/발주|롱리드|po/i.test(text)&&/등록|추가|발주/.test(text)){const ll=/롱리드|수입|임계/.test(text);const nm=text.replace(/롱리드로?|임계경로|수입품|발주(해|로)?|등록(해|줘)?|추가(해|줘)?|po/gi,"").replace(/[,\.]/g," ").trim()||"신규 기자재";const eta=new Date(today.getTime()+(ll?120:40)*86400000).toISOString().slice(0,10);proc.push({n:nm,v:/nea/i.test(text)?"NEA(독일)":"미정",ll,st:"ordered",eta,amt:0});refresh();flashR(proc.length-1);return say("a",`🛒 기자재 '<b>${nm}</b>' 발주 등록(ETA ${eta}).${ll?' <b style="color:var(--warn)">롱리드 임계경로</b>로 표시.':''}`)}
+ if(/구매|기자재|자재|입고율|롱리드/.test(text)&&/현황|얼마|알려|요약|어때|상태/.test(text)){const rr=recRate(),lo=llOver();const ll=proc.filter(p=>p.ll).map(p=>p.n+`(${PS[p.st][0]}, ETA ${p.eta})`);return say("a",`📦 <b>기자재 구매</b><br>입고율 ${rr.rate}% (${rr.r}/${proc.length}) · 롱리드 지연 ${lo}건<br>롱리드: ${ll.join(", ")||"없음"}`)}
+ if(/대금|기성/.test(text)&&/등록|청구|올려|기록/.test(text)){const amt=parseWon(text);if(!amt)return say("a",'대금 금액을 인식하지 못했습니다. 예: "중도금 5억 청구".');const ret=Math.round(amt*RET),adv=Math.round(amt*ADV),net=amt-ret-adv;bill.period+=1;bill.cum+=amt;bill.retention+=ret;bill.net+=net;refresh();return say("a",`🧾 ${bill.period}회차 대금 <b>${eok(amt)}</b> 청구.<br>유보 ${eok(ret)}(5%)·선급정산 ${eok(adv)}(10%) → 실수금 ${eok(net)}<br>누계 대금률 ${round(bill.cum/CONTRACT*100,0)}%`)}
+ if(/fat|안전|품질/i.test(text)&&/점검|시험|불합격|합격|지적/.test(text)){const ty=/fat/i.test(text)?"FAT":/품질/.test(text)?"품질":"안전";const res=/불합격|불량|미흡|누설|미설치/.test(text)?["불합격","var(--danger)"]:/조건부/.test(text)?["조건부","var(--warn)"]:["합격","var(--ok)"];insp.push(res[0]);return say("a",`📋 ${ty} 결과: <b style="color:${res[1]}">${res[0]}</b>.${res[0]!=="합격"?" 시정 대상 등록.":""}`)}
+ if(/진척|단계|공정|현황|요약/.test(text)){const pa=weighted("ac"),pp=weighted("pl"),v=round(pa-pp,1);const late=ph.filter(p=>p.ac<p.pl).sort((a,b)=>(a.ac-a.pl)-(b.ac-b.pl)).slice(0,3);return say("a",`📊 <b>단계 진척</b><br>실적 ${pa}% / 계획 ${pp}% (${v>=0?"+"+v:v}%p)<br>지연: ${late.map(p=>p.n+`(${round(p.ac-p.pl,1)})`).join(", ")||"없음"}`)}
+ say("a",'진척 갱신 · 기자재 발주/입고 · 구매 현황 · 대금 청구 · FAT 점검을 시도해 보세요.');
 }
-const ex=["철근콘크리트 공정률 65%로 갱신해줘","3회차 기성 2억5천 등록해줘","기성 현황 알려줘","원가 집행 현황 요약해줘","안전점검 불합격 3층 개구부 난간 미설치"];
+const ex=["상세설계 진척 80%로 갱신해줘","NEA 압축기 본체 입고 처리해줘","기자재 구매 현황 알려줘","중도금 5억 청구해줘","FAT 합격 처리"];
 $("chips").innerHTML=ex.map(e=>`<button class="chip" type="button">${e}</button>`).join("");
 document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>handle(b.textContent));
 $("form").onsubmit=e=>{e.preventDefault();const i=$("input");if(i.value.trim()){handle(i.value.trim());i.value=""}};
-refresh();
-say("a",'한강 푸르지오 현장입니다. 기성 등록 시 유보(3%)·선급금정산(10%)이 자동 차감되어 실지급액이 계산됩니다. 예시를 눌러보세요.');
+refresh();say("a",'창원 수소충전소 압축기 패키지 수주입니다. NEA 압축기 본체가 롱리드 임계경로예요. 진척·구매·대금·FAT를 명령해 보세요.');
 </script>
 </body>
 </html>

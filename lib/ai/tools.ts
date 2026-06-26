@@ -11,21 +11,42 @@ import type Anthropic from "@anthropic-ai/sdk";
 export const tools: Anthropic.Tool[] = [
   {
     name: "get_progress_summary",
-    description: "현장의 공정률 현황(계획 대비 실적, 지연 공종)을 조회한다.",
+    description: "수주 프로젝트의 단계별 진척 현황(계획 대비 실적, 지연 단계)을 조회한다.",
     input_schema: { type: "object", properties: {} },
   },
   {
     name: "update_progress",
-    description: "특정 공종의 실적 공정률을 갱신한다. work_query로 공종을 지정.",
+    description: "특정 단계(설계·구매·제작·FAT 등)의 실적 진척률을 갱신한다. work_query로 단계를 지정.",
     input_schema: {
       type: "object",
       properties: {
-        work_query: { type: "string", description: "공정률을 갱신할 공종에 대한 자연어 설명(예: 철근콘크리트)" },
-        actual_progress: { type: "number", description: "실적 공정률(%) 0~100" },
+        work_query: { type: "string", description: "진척을 갱신할 단계에 대한 자연어 설명(예: 상세설계, 제작)" },
+        actual_progress: { type: "number", description: "실적 진척률(%) 0~100" },
         note: { type: "string", description: "비고(선택)" },
       },
       required: ["work_query", "actual_progress"],
     },
+  },
+  {
+    name: "record_procurement",
+    description: "기자재 발주/입고를 기록한다. 롱리드 수입품(예: NEA 압축기 본체) 납기 추적에 사용.",
+    input_schema: {
+      type: "object",
+      properties: {
+        name: { type: "string", description: "품목명(예: NEA 다이어프램 압축기 본체)" },
+        vendor_name: { type: "string", description: "공급사(선택)" },
+        amount: { type: "number", description: "발주 금액(원, 선택)" },
+        lead_time_weeks: { type: "number", description: "리드타임(주, 선택)" },
+        status: { type: "string", enum: ["planned", "ordered", "in_transit", "received", "inspected"] },
+        is_long_lead: { type: "boolean", description: "롱리드(임계경로) 품목 여부" },
+      },
+      required: ["name"],
+    },
+  },
+  {
+    name: "get_procurement_status",
+    description: "기자재 입고율과 롱리드 품목 지연 현황을 조회한다.",
+    input_schema: { type: "object", properties: {} },
   },
   {
     name: "get_billing_status",
@@ -83,5 +104,7 @@ export const TOOL_TO_INTENT: Record<string, string> = {
   record_billing: "record_billing",
   get_cost_summary: "get_cost_summary",
   log_inspection: "log_inspection",
+  record_procurement: "record_procurement",
+  get_procurement_status: "get_procurement_status",
   search: "search",
 };
