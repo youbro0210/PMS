@@ -26,7 +26,7 @@ AI 경로:    브라우저 ── /api/ai/* (서버) ── Claude ── execut
 | 협력업체 | `subcontractors` | 하도급사, 공종, 계약금액 |
 | 공종/WBS | `work_packages` | 계층 구조, 가중치, 계획/실적 공정률 |
 | 공정 실적 | `progress_records` | 기간별 계획 대비 실적 이력 |
-| 기성 | `billings`, `billing_items` | 회차별 청구·사정·확정·지급, 누계 기성률 |
+| 기성 | `billings`, `billing_items` | 회차별 청구·사정·확정·지급, 누계 기성률, **선급금 정산·유보(유보율)·실지급액** |
 | 실행예산/원가 | `budget_items`, `cost_entries` | 노무·자재·외주·장비·경비 |
 | 안전/품질 | `inspections` | 점검 결과·지적·시정 |
 
@@ -71,10 +71,13 @@ demo/preview.html         백엔드 없이 도는 구동 미리보기
 ## 셋업
 
 1. 의존성: `npm install`
-2. Supabase SQL Editor에 마이그레이션 순서대로 실행: `0001` → `0002` → `0003`
+2. 마이그레이션 순서대로 실행: `0001` → `0002` → `0003` → `0004` (Supabase SQL Editor 또는 `docker compose` psql)
 3. 환경변수: `.env.example`을 `.env.local`로 복사 후 채우기 (Supabase 키, `ANTHROPIC_API_KEY`, 모델명)
 4. 타입 생성(권장): `npx supabase gen types typescript --project-id <id> > lib/db/types.ts`
 5. 개발 서버: `npm run dev`
+
+배포(PostgreSQL · 어디서나 접근 · GitHub 동기화)는 [`DEPLOYMENT.md`](./DEPLOYMENT.md) 참고.
+디자인은 www.syu.ai.kr의 화이트/네이비 기업형 톤을 따랐다(`app/globals.css`).
 
 > `0002_pgvector.sql`은 대규모 현장에서 "비슷한 안전 지적사항 찾기" 같은 의미 검색이 필요할 때
 > 활성화하는 선택 사항이다. 건설 MVP의 기본 검색은 단순 매칭(`executors.search`)을 쓴다.

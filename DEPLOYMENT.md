@@ -40,9 +40,12 @@ docker run -p 3000:3000 --env-file .env.local pms-web
 
 ## 3. GitHub 소스 동기화
 
-로컬에서 git 저장소를 초기화하고 첫 커밋까지 만들어 두었다. 원격 연결만 하면 된다:
+로컬에서 git 저장소를 초기화하고 첫 커밋까지 만들어 두었다(브랜치: `master`). 원격 연결만 하면 된다:
 
 ```bash
+# 0) (한 번만) 샌드박스에서 남은 스테일 락 파일 제거 — 본인 PC에서는 권한 문제 없음
+rm -f .git/index.lock .git/HEAD.lock .git/objects/maintenance.lock
+
 # (이미 git init + 최초 커밋 완료된 상태)
 # 1) GitHub에서 빈 저장소 생성 (예: my-pms) — README 체크 해제
 
