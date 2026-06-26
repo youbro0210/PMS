@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { NotificationBell } from "@/components/layout/NotificationBell";
 
-/** 헤더 우측 사용자 메뉴 — 이메일·관리자 배지·관리자 페이지·로그아웃 */
+/** 헤더 우측 사용자 메뉴 — 알림·이메일·관리자 배지·관리자 페이지·로그아웃 */
 export function UserMenu() {
   const router = useRouter();
   const supabase = createClient();
@@ -33,6 +34,7 @@ export function UserMenu() {
 
   return (
     <div className="flex items-center gap-3 text-sm">
+      <NotificationBell />
       {isAdmin && (
         <Link href="/admin" className="rounded px-2 py-0.5 text-xs" style={{ background: "var(--accent-soft)", color: "var(--accent)" }}>
           관리자

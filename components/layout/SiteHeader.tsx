@@ -14,10 +14,7 @@ export function SiteHeader() {
         </Link>
         <nav className="hidden items-center gap-6 text-sm sm:flex" style={{ color: "var(--text)" }}>
           <Link href="/">수주</Link>
-          <span style={{ color: "var(--muted)" }}>단계</span>
-          <span style={{ color: "var(--muted)" }}>대금</span>
-          <span style={{ color: "var(--muted)" }}>구매</span>
-          <span style={{ color: "var(--muted)" }}>FAT</span>
+          <Link href="/portfolio">전사 현황</Link>
         </nav>
       </div>
       <UserMenu />

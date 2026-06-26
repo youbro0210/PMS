@@ -67,11 +67,17 @@ AI 경로:    브라우저 ── /api/ai/* (서버) ── Claude ── execut
 app/
   login/  signup/         로그인 · 회원가입
   admin/                  시스템 관리자(전체 사용자·관리자 권한 토글)
+  portfolio/              전사 수주 현황(진척·대금·롱리드·납기 리스크)
   page.tsx                수주 목록 + 신규 등록 버튼
   projects/new/           신규 수주 등록(제품·계약·납기 + 표준 단계 시드)
   projects/[id]/board/    수주 대시보드 + AI 어시스턴트 패널
-  projects/[id]/members/  멤버·권한 관리(이메일 초대·역할 변경·삭제)
+  projects/[id]/billings/     대금 수동 입력(유보·선급 자동 차감)
+  projects/[id]/procurement/  기자재 수동 입력(롱리드·ETA·상태)
+  projects/[id]/activity/     활동 로그·감사(activity_log + AI 로그)
+  projects/[id]/members/      멤버·권한 관리(이메일 초대·역할)
   api/ai/command/         자연어 명령 엔드포인트
+components/layout/
+  NotificationBell        헤더 알림(저장 알림 + 납기/롱리드 임박 계산)
 lib/
   supabase/               server / client / admin 클라이언트
   db/                     types, 직접경로 queries
@@ -86,6 +92,8 @@ supabase/migrations/
   0004_billing_*.sql      선급금·기성 유보 정산
   0005_project_*.sql      신규 등록 RPC + 표준 공종 시드
   0006_mnsi_eto.sql       수주 제조(ETO): 제품유형·기자재구매(롱리드)·FAT·단계 시드
+  0007_users_roles.sql    회원·권한·시스템 관리자·멤버 초대 RPC
+  0008_notifications_*.sql 알림·활동 로그(감사) + 이벤트 트리거
 demo/preview.html         백엔드 없이 도는 구동 미리보기
 ```
 

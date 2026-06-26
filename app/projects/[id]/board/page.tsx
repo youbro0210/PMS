@@ -32,9 +32,12 @@ export default async function SitePage({ params }: { params: Promise<{ id: strin
             {project.delivery_date ? ` · 납기 ${project.delivery_date}` : ""}
           </p>
         </div>
-        <Link href={`/projects/${id}/members`} className="ml-auto text-sm" style={{ color: "var(--accent)" }}>
-          멤버 관리
-        </Link>
+        <nav className="ml-auto flex items-center gap-4 text-sm" style={{ color: "var(--accent)" }}>
+          <Link href={`/projects/${id}/billings`}>대금</Link>
+          <Link href={`/projects/${id}/procurement`}>구매</Link>
+          <Link href={`/projects/${id}/activity`}>활동</Link>
+          <Link href={`/projects/${id}/members`}>멤버</Link>
+        </nav>
       </header>
 
       <div className="flex flex-1 overflow-hidden">

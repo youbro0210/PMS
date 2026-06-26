@@ -184,6 +184,28 @@ export interface ProcurementItem {
   created_at: string;
 }
 
+export interface Notification {
+  id: string;
+  user_id: string;
+  project_id: string | null;
+  type: string;
+  title: string;
+  body: string | null;
+  link: string | null;
+  is_read: boolean;
+  created_at: string;
+}
+
+export interface ActivityLog {
+  id: string;
+  project_id: string | null;
+  actor_id: string | null;
+  entity: string;
+  action: string;
+  summary: string | null;
+  created_at: string;
+}
+
 export interface AiActionLog {
   id: string;
   user_id: string | null;
@@ -216,6 +238,8 @@ export interface Database {
       cost_entries: { Row: CostEntry; Insert: Insertable<CostEntry, "project_id" | "category" | "amount">; Update: Partial<CostEntry> };
       inspections: { Row: Inspection; Insert: Insertable<Inspection, "project_id" | "type">; Update: Partial<Inspection> };
       procurement_items: { Row: ProcurementItem; Insert: Insertable<ProcurementItem, "project_id" | "name">; Update: Partial<ProcurementItem> };
+      notifications: { Row: Notification; Insert: Insertable<Notification, "user_id" | "type" | "title">; Update: Partial<Notification> };
+      activity_log: { Row: ActivityLog; Insert: Insertable<ActivityLog, "entity" | "action">; Update: Partial<ActivityLog> };
       ai_action_logs: { Row: AiActionLog; Insert: Insertable<AiActionLog, "input_text">; Update: Partial<AiActionLog> };
     };
     Views: {
