@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* SYU(에스와이유) 기업형 톤: 화이트 배경 · 네이비 헤딩 · 블루 포인트 */
+:root{
+  --background:#f4f6fa;     /* 페이지 배경(연한 블루그레이) */
+  --surface:#ffffff;        /* 카드 */
+  --surface-2:#f8fafc;      /* 보조 표면 */
+  --border:#e3e8f1;
+  --text:#16203a;           /* 본문/헤딩(딥 네이비) */
+  --muted:#6b7689;
+  --navy:#1b2a63;           /* 브랜드 네이비 */
+  --navy-deep:#14225a;
+  --accent:#2f6bd8;         /* 브랜드 블루 포인트 */
+  --accent-soft:#eaf1fc;
+  --ok:#1d9e75;
+  --warn:#e09017;
+  --danger:#d93a3a;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--background);
+  color:var(--text);
+  font-family:"Pretendard",system-ui,-apple-system,"Segoe UI",Roboto,"Malgun Gothic",sans-serif;
+}
+
+/* SYU 히어로: 네이비 그라데이션 + 유리 외관 느낌(이미지 대체 가능) */
+.syu-hero{
+  background:
+    linear-gradient(120deg, rgba(20,34,90,.92), rgba(27,42,99,.72)),
+    linear-gradient(180deg, #2a3c7a 0%, #1b2a63 100%);
+  color:#fff;
+}
+.syu-logo{
+  font-style:italic;font-weight:800;letter-spacing:-1px;
+  color:var(--navy);
+}
