@@ -186,6 +186,30 @@ export interface Database {
         Row: { project_id: string; category: CostCategory; total: number };
       };
     };
-    Functions: Record<string, never>;
+    Functions: {
+      create_project: {
+        Args: {
+          p_name: string;
+          p_construction_type?: string | null;
+          p_client_name?: string | null;
+          p_contractor_name?: string | null;
+          p_contract_no?: string | null;
+          p_contract_amount?: number | null;
+          p_start_date?: string | null;
+          p_end_date?: string | null;
+          p_site_address?: string | null;
+          p_advance_payment?: number | null;
+          p_advance_recovery_rate?: number | null;
+          p_retention_rate?: number | null;
+          p_description?: string | null;
+          p_icon?: string | null;
+        };
+        Returns: string; // 생성된 project id
+      };
+      seed_standard_works: {
+        Args: { p_project_id: string };
+        Returns: number;
+      };
+    };
   };
 }

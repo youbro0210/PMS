@@ -51,7 +51,8 @@ AI 경로:    브라우저 ── /api/ai/* (서버) ── Claude ── execut
 ```
 app/
   login/                  로그인
-  page.tsx                현장(프로젝트) 목록
+  page.tsx                현장(프로젝트) 목록 + 신규 등록 버튼
+  projects/new/           신규 현장 등록(기본·계약·정산 + 표준 공종 시드)
   projects/[id]/board/    현장 대시보드 + AI 어시스턴트 패널
   api/ai/command/         자연어 명령 엔드포인트
 lib/
@@ -65,6 +66,8 @@ supabase/migrations/
   0001_init.sql           기반(현장·멤버·RLS·트리거)
   0002_pgvector.sql       (선택) 의미 검색용 임베딩
   0003_construction.sql   건설 도메인(기성·공정·원가·협력사·안전)
+  0004_billing_*.sql      선급금·기성 유보 정산
+  0005_project_*.sql      현장 신규 등록 RPC + 표준 공종 시드
 demo/preview.html         백엔드 없이 도는 구동 미리보기
 ```
 

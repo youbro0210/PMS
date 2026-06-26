@@ -23,7 +23,16 @@ export default async function HomePage() {
       </section>
 
       <section className="mx-auto max-w-5xl px-8 py-10">
-        <h2 className="mb-5 text-lg font-semibold" style={{ color: "var(--navy)" }}>현장 목록</h2>
+        <div className="mb-5 flex items-center justify-between">
+          <h2 className="text-lg font-semibold" style={{ color: "var(--navy)" }}>현장 목록</h2>
+          <Link
+            href="/projects/new"
+            className="rounded-md px-4 py-2 text-sm font-medium text-white"
+            style={{ background: "var(--accent)" }}
+          >
+            + 신규 현장 등록
+          </Link>
+        </div>
         {projects.length === 0 ? (
           <p style={{ color: "var(--muted)" }}>등록된 현장이 없습니다.</p>
         ) : (
