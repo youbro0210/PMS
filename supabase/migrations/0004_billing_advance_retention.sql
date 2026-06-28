@@ -49,7 +49,8 @@ create trigger trg_billing_net
 -- ------------------------------------------------------------
 -- C. 기성 현황 뷰 보강 — 유보 누계·선급금 잔액·실지급 누계
 -- ------------------------------------------------------------
-create or replace view public.billing_summary as
+drop view if exists public.billing_summary;
+create view public.billing_summary as
 select
   b.project_id,
   count(*)                          as billing_count,

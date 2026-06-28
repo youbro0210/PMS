@@ -161,6 +161,11 @@ comment on function public.seed_standard_phases is '수주 제조 표준 단계 
 -- ------------------------------------------------------------
 -- G. create_project 확장 — 제품유형·납품처·납기·수주번호 포함
 -- ------------------------------------------------------------
+-- 0005의 14인자 버전을 제거(인자 추가로 시그니처가 바뀌어 중복 방지)
+drop function if exists public.create_project(
+  text, text, text, text, text, numeric, date, date, text, numeric, numeric, numeric, text, text
+);
+
 create or replace function public.create_project(
   p_name                  text,
   p_construction_type     text    default null,   -- (호환) 사업부문/구분

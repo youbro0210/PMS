@@ -120,6 +120,7 @@ export async function runCommand(req: CommandRequest): Promise<CommandResponse> 
   } catch (e) {
     success = false;
     errorMessage = e instanceof Error ? e.message : String(e);
+    console.error("[ai/command] 실패:", errorMessage, e);
     reply = "요청을 처리하는 중 오류가 발생했습니다.";
   }
 
