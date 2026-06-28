@@ -17,7 +17,7 @@ interface Msg {
  * /api/ai/command를 호출하고, 되묻기/확인이 필요하면 후속 버튼을 렌더한다.
  * 명령 성공 시 router.refresh()로 보드를 갱신한다.
  */
-export function ChatPanel({ projectId }: { projectId: string }) {
+export function ChatPanel({ projectId, onChange }: { projectId: string; onChange?: () => void }) {
   const router = useRouter();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -64,8 +64,11 @@ export function ChatPanel({ projectId }: { projectId: string }) {
         },
       ]);
 
-      // 실제 변경이 일어났으면 보드 갱신
-      if (data.executor?.ok) router.refresh();
+      // 실제 변경이 일어났으면 대시보드 즉시 갱신(클라이언트 재조회 + 서버 새로고침)
+      if (data.executor?.ok) {
+        onChange?.();
+        router.refresh();
+      }
     } catch {
       setMessages((m) => [...m, { role: "assistant", text: "네트워크 오류가 발생했습니다." }]);
     } finally {
@@ -74,7 +77,7 @@ export function ChatPanel({ projectId }: { projectId: string }) {
   }
 
   return (
-    <aside className="flex w-96 flex-shrink-0 flex-col border-l" style={{ borderColor: "var(--border)" }}>
+    <aside className="flex h-96 w-full flex-shrink-0 flex-col border-t lg:h-auto lg:w-96 lg:border-l lg:border-t-0" style={{ borderColor: "var(--border)" }}>
       <div className="flex items-center justify-between border-b p-3 text-sm font-medium" style={{ borderColor: "var(--border)" }}>
         <span>AI 어시스턴트</span>
         {messages.length > 0 && (

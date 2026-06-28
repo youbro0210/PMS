@@ -54,12 +54,13 @@ export async function runCommand(req: CommandRequest): Promise<CommandResponse> 
   let errorMessage: string | null = null;
 
   try {
-    // 1차: 도구 선택
+    // 1차: 도구 선택 (병렬 도구 호출 비활성화 → 한 번에 하나의 도구만)
     const first = await anthropic.messages.create({
       model,
       max_tokens: 1024,
       system,
       tools,
+      tool_choice: { type: "auto", disable_parallel_tool_use: true },
       messages,
     });
     inputTokens += first.usage.input_tokens;
@@ -94,28 +95,29 @@ export async function runCommand(req: CommandRequest): Promise<CommandResponse> 
     }
 
     // 3차: 실행 결과를 Claude에 되돌려 확정 응답 생성
+    // 안전장치: first.content의 모든 tool_use 블록에 tool_result를 만들어 준다
+    // (Anthropic은 tool_use마다 대응 tool_result를 요구함)
+    const toolUses = first.content.filter((c) => c.type === "tool_use") as Anthropic.ToolUseBlock[];
+    const toolResults = await Promise.all(
+      toolUses.map(async (tu) => {
+        const res = tu.id === toolUse.id ? executor! : await executeTool(tu.name, tu.input as Record<string, unknown>, ctx);
+        return { type: "tool_result" as const, tool_use_id: tu.id, content: JSON.stringify(res), is_error: !(res as ExecutorResult).ok };
+      }),
+    );
     messages.push({ role: "assistant", content: first.content });
-    messages.push({
-      role: "user",
-      content: [
-        {
-          type: "tool_result",
-          tool_use_id: toolUse.id,
-          content: JSON.stringify(executor),
-          is_error: !executor.ok,
-        },
-      ],
-    });
+    messages.push({ role: "user", content: toolResults });
 
-    const second = await anthropic.messages.create({
-      model,
-      max_tokens: 1024,
-      system,
-      messages,
-    });
-    inputTokens += second.usage.input_tokens;
-    outputTokens += second.usage.output_tokens;
-    reply = second.content.filter((c) => c.type === "text").map((c) => (c as Anthropic.TextBlock).text).join("\n");
+    try {
+      const second = await anthropic.messages.create({ model, max_tokens: 1024, system, messages });
+      inputTokens += second.usage.input_tokens;
+      outputTokens += second.usage.output_tokens;
+      reply = second.content.filter((c) => c.type === "text").map((c) => (c as Anthropic.TextBlock).text).join("\n").trim();
+    } catch (e2) {
+      // 요약 생성 실패해도 실행은 됐으니 결과 메시지로 대체
+      console.error("[ai/command] 요약 생성 실패:", e2);
+      reply = executor.message;
+    }
+    if (!reply) reply = executor.message;
     if (!executor.ok) success = false;
   } catch (e) {
     success = false;

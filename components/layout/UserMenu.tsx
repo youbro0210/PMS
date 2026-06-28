@@ -40,7 +40,7 @@ export function UserMenu() {
           관리자
         </Link>
       )}
-      <span style={{ color: "var(--muted)" }}>{email}</span>
+      <span className="hidden max-w-[160px] truncate sm:inline" style={{ color: "var(--muted)" }}>{email}</span>
       <button onClick={signOut} className="rounded-md border px-2.5 py-1 text-xs" style={{ borderColor: "var(--border)" }}>
         로그아웃
       </button>
