@@ -145,17 +145,27 @@ export function ChatPanel({ projectId, onChange }: { projectId: string; onChange
           e.preventDefault();
           send(input);
         }}
-        className="border-t p-3"
+        className="flex items-center gap-2 border-t p-3"
         style={{ borderColor: "var(--border)" }}
       >
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           disabled={busy}
+          enterKeyHint="send"
           placeholder={busy ? "처리 중…" : "자연어로 명령하세요"}
-          className="w-full rounded-md border bg-transparent px-3 py-2 text-sm"
+          className="min-w-0 flex-1 rounded-md border bg-transparent px-3 py-2 text-sm"
           style={{ borderColor: "var(--border)" }}
         />
+        <button
+          type="submit"
+          disabled={busy || !input.trim()}
+          aria-label="전송"
+          className="flex-shrink-0 rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+          style={{ background: "var(--accent)" }}
+        >
+          전송
+        </button>
       </form>
     </aside>
   );
