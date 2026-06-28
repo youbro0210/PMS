@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { formatThousands, parseAmount } from "@/lib/format";
 import type { ProcurementItem, ProcurementStatus } from "@/lib/db/types";
 
 const won = (n: number | null | undefined) => (n == null ? "-" : new Intl.NumberFormat("ko-KR").format(n) + "원");
@@ -33,7 +34,7 @@ export default function ProcurementPage() {
     const lead = f.lead ? Number(f.lead) : null;
     const eta = lead != null ? new Date(Date.now() + lead * 7 * 86400000).toISOString().slice(0, 10) : null;
     const { error } = await supabase.from("procurement_items").insert({
-      project_id: id, name: f.name.trim(), amount: f.amount ? Number(f.amount.replace(/,/g, "")) : 0,
+      project_id: id, name: f.name.trim(), amount: parseAmount(f.amount) ?? 0,
       lead_time_weeks: lead, eta, is_long_lead: f.longLead, status: "ordered", order_date: new Date().toISOString().slice(0, 10),
     });
     if (error) { setErr(error.message); return; }
@@ -44,6 +45,13 @@ export default function ProcurementPage() {
     const patch: Record<string, unknown> = { status };
     if (status === "received" || status === "inspected") patch.received_date = new Date().toISOString().slice(0, 10);
     await supabase.from("procurement_items").update(patch).eq("id", itemId);
+    void load();
+  }
+
+  async function remove(itemId: string, name: string) {
+    if (!confirm(`'${name}' 기자재를 삭제할까요?`)) return;
+    const { error } = await supabase.from("procurement_items").delete().eq("id", itemId);
+    if (error) { setErr(error.message); return; }
     void load();
   }
 
@@ -64,7 +72,7 @@ export default function ProcurementPage() {
             <label className="mb-1 block text-xs font-medium">품목명</label>
             <input className={`${input} w-full`} style={style} placeholder="예: NEA 압축기 본체" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} required />
           </div>
-          <div><label className="mb-1 block text-xs font-medium">금액(원)</label><input className={input} style={style} inputMode="numeric" value={f.amount} onChange={(e) => setF({ ...f, amount: e.target.value })} /></div>
+          <div><label className="mb-1 block text-xs font-medium">금액(원)</label><input className={input} style={style} inputMode="numeric" placeholder="예: 720,000,000" value={f.amount} onChange={(e) => setF({ ...f, amount: formatThousands(e.target.value) })} /></div>
           <div><label className="mb-1 block text-xs font-medium">리드타임(주)</label><input className={input} style={{ ...style, width: 90 }} inputMode="numeric" value={f.lead} onChange={(e) => setF({ ...f, lead: e.target.value })} /></div>
           <label className="flex items-center gap-1.5 pb-2 text-xs"><input type="checkbox" checked={f.longLead} onChange={(e) => setF({ ...f, longLead: e.target.checked })} />롱리드</label>
           <button type="submit" className="rounded-md px-4 py-2 text-sm font-medium text-white" style={{ background: "var(--accent)" }}>발주 등록</button>
@@ -78,9 +86,12 @@ export default function ProcurementPage() {
                 <div className="text-sm font-medium">{r.is_long_lead && <span style={{ color: "var(--warn, #e09017)" }}>⚠ </span>}{r.name}</div>
                 <div className="text-xs" style={{ color: "var(--muted)" }}>{won(r.amount)}{r.eta ? ` · ETA ${r.eta}` : ""}{r.lead_time_weeks ? ` · 리드 ${r.lead_time_weeks}주` : ""}</div>
               </div>
-              <select className="rounded-md border bg-transparent px-2 py-1 text-xs" style={style} value={r.status} onChange={(e) => setStatus(r.id, e.target.value as ProcurementStatus)}>
-                {ST.map((s) => <option key={s.v} value={s.v}>{s.l}</option>)}
-              </select>
+              <div className="flex items-center gap-3">
+                <select className="rounded-md border bg-transparent px-2 py-1 text-xs" style={style} value={r.status} onChange={(e) => setStatus(r.id, e.target.value as ProcurementStatus)}>
+                  {ST.map((s) => <option key={s.v} value={s.v}>{s.l}</option>)}
+                </select>
+                <button onClick={() => remove(r.id, r.name)} className="text-xs text-red-500">삭제</button>
+              </div>
             </div>
           ))}
           {rows.length === 0 && <p className="px-4 py-6 text-sm" style={{ color: "var(--muted)" }}>등록된 기자재가 없습니다.</p>}

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { formatThousands } from "@/lib/format";
 
 const PRODUCT_TYPES: { value: string; label: string }[] = [
   { value: "compressor", label: "압축기 유닛(수소·가스)" },
@@ -45,6 +46,8 @@ export default function NewProjectPage() {
   });
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setF((p) => ({ ...p, [k]: e.target.value }));
+  const money = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setF((p) => ({ ...p, [k]: formatThousands(e.target.value) }));
   const num = (v: string) => (v.trim() === "" ? null : Number(v.replace(/,/g, "")));
 
   async function submit(e: React.FormEvent) {
@@ -136,7 +139,7 @@ export default function NewProjectPage() {
               </div>
               <div>
                 <label className={label}>계약금액(원)</label>
-                <input className={input} style={inputStyle} value={f.contract_amount} onChange={set("contract_amount")} inputMode="numeric" placeholder="예: 1800000000" />
+                <input className={input} style={inputStyle} value={f.contract_amount} onChange={money("contract_amount")} inputMode="numeric" placeholder="예: 1,800,000,000" />
               </div>
               <div>
                 <label className={label}>착수일</label>
@@ -154,7 +157,7 @@ export default function NewProjectPage() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div>
                 <label className={label}>선급금(원)</label>
-                <input className={input} style={inputStyle} value={f.advance_payment} onChange={set("advance_payment")} inputMode="numeric" placeholder="예: 180000000" />
+                <input className={input} style={inputStyle} value={f.advance_payment} onChange={money("advance_payment")} inputMode="numeric" placeholder="예: 180,000,000" />
               </div>
               <div>
                 <label className={label}>선급금 정산율(%)</label>

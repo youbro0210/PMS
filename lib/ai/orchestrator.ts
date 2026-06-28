@@ -34,7 +34,7 @@ export interface CommandResponse {
  */
 export async function runCommand(req: CommandRequest): Promise<CommandResponse> {
   const started = Date.now();
-  const model = process.env.CLAUDE_MODEL_ROUTER ?? "claude-haiku-4-5";
+  const model = process.env.CLAUDE_MODEL_ROUTER ?? "claude-haiku-4-5-20251001";
 
   const system = buildCommandSystemPrompt({
     projectName: req.projectName,
