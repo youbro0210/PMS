@@ -23,6 +23,21 @@ export function ChatPanel({ projectId }: { projectId: string }) {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
 
+  // 마크다운을 간결한 평문 HTML로 정리(표·헤더 제거, 굵게·줄바꿈만 유지)
+  function format(text: string): string {
+    const esc = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    return esc
+      .split("\n")
+      .filter((l) => !/^\s*\|?\s*[-|:\s]+\|?\s*$/.test(l)) // 표 구분선 제거
+      .map((l) => l.replace(/^#{1,6}\s*/, "").replace(/^\s*[-*]\s+/, "· "))
+      .join("\n")
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\s*\|\s*/g, "  ") // 표 파이프 → 공백
+      .replace(/\n{2,}/g, "\n")
+      .trim()
+      .replace(/\n/g, "<br/>");
+  }
+
   async function send(text: string, confirmed = false) {
     if (!text.trim()) return;
     if (!confirmed) setMessages((m) => [...m, { role: "user", text }]);
@@ -60,8 +75,17 @@ export function ChatPanel({ projectId }: { projectId: string }) {
 
   return (
     <aside className="flex w-96 flex-shrink-0 flex-col border-l" style={{ borderColor: "var(--border)" }}>
-      <div className="border-b p-3 text-sm font-medium" style={{ borderColor: "var(--border)" }}>
-        AI 어시스턴트
+      <div className="flex items-center justify-between border-b p-3 text-sm font-medium" style={{ borderColor: "var(--border)" }}>
+        <span>AI 어시스턴트</span>
+        {messages.length > 0 && (
+          <button
+            onClick={() => setMessages([])}
+            className="rounded-md border px-2 py-0.5 text-xs font-normal"
+            style={{ borderColor: "var(--border)", color: "var(--muted)" }}
+          >
+            초기화
+          </button>
+        )}
       </div>
 
       <div className="flex-1 space-y-3 overflow-y-auto p-3">
@@ -73,13 +97,15 @@ export function ChatPanel({ projectId }: { projectId: string }) {
         {messages.map((m, i) => (
           <div key={i} className={m.role === "user" ? "text-right" : "text-left"}>
             <div
-              className="inline-block max-w-[85%] rounded-lg px-3 py-2 text-sm"
+              className="inline-block max-w-[88%] whitespace-pre-wrap rounded-lg px-3 py-2 text-left text-sm leading-relaxed"
               style={{
                 background: m.role === "user" ? "var(--accent)" : "var(--surface-2)",
                 color: m.role === "user" ? "#fff" : "var(--text)",
               }}
             >
-              {m.text}
+              {m.role === "assistant"
+                ? <span dangerouslySetInnerHTML={{ __html: format(m.text) }} />
+                : m.text}
             </div>
 
             {m.needsConfirmation && (

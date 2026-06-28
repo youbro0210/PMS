@@ -24,8 +24,11 @@ export default async function SitePage({ params }: { params: Promise<{ id: strin
   return (
     <main className="flex h-screen flex-col">
       <header className="flex items-center gap-3 border-b p-4" style={{ borderColor: "var(--border)" }}>
-        <span className="text-2xl">{project.icon}</span>
-        <div>
+        <Link href="/portfolio" className="rounded-md px-3 py-1.5 text-sm font-medium text-white" style={{ background: "var(--accent)" }}>
+          전체 수주현황
+        </Link>
+        <Link href="/" className="text-sm" style={{ color: "var(--muted)" }}>수주목록</Link>
+        <div className="ml-2">
           <h1 className="text-lg font-semibold">{project.name}</h1>
           <p className="text-xs" style={{ color: "var(--muted)" }}>
             {project.client_name ?? "고객 미지정"} · {project.end_user ?? "납품처 미지정"}
