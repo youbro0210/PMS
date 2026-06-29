@@ -28,6 +28,13 @@ export interface ErpSyncResult {
   error?: string;
 }
 
+export interface ErpConfig {
+  adapter: string;        // mock | staging | rest
+  baseUrl?: string | null;
+  apiKey?: string | null;
+  enabled?: boolean;
+}
+
 export interface ErpAdapter {
   name: string;
   send(input: ErpSyncInput): Promise<ErpSyncResult>;
@@ -63,10 +70,12 @@ class StagingAdapter implements ErpAdapter {
  */
 class RestAdapter implements ErpAdapter {
   name = "rest";
+  private cfg: ErpConfig;
+  constructor(cfg: ErpConfig) { this.cfg = cfg; }
   async send(input: ErpSyncInput): Promise<ErpSyncResult> {
-    const base = process.env.ERP_BASE_URL;
-    const key = process.env.ERP_API_KEY;
-    if (!base || !key) return { ok: false, error: "ERP_BASE_URL/ERP_API_KEY 미설정" };
+    const base = this.cfg.baseUrl || process.env.ERP_BASE_URL;
+    const key = this.cfg.apiKey || process.env.ERP_API_KEY;
+    if (!base || !key) return { ok: false, error: "ERP 주소/키 미설정(설정 화면에서 입력)" };
 
     // TODO(옴니이솔 규격 확정 후): 엔드포인트·바디·인증 헤더를 규격에 맞게.
     const res = await fetch(`${base.replace(/\/$/, "")}/${input.entity}`, {
@@ -84,10 +93,12 @@ class RestAdapter implements ErpAdapter {
   }
 }
 
-export function getErpAdapter(): ErpAdapter {
-  switch (process.env.ERP_ADAPTER) {
+/** DB 설정(erp_config)을 우선 적용해 어댑터를 생성. 없으면 환경변수 폴백. */
+export function getErpAdapter(cfg?: ErpConfig): ErpAdapter {
+  const mode = cfg?.adapter ?? process.env.ERP_ADAPTER ?? "mock";
+  switch (mode) {
     case "staging": return new StagingAdapter();
-    case "rest": return new RestAdapter();
+    case "rest": return new RestAdapter(cfg ?? { adapter: "rest" });
     default: return new MockAdapter();
   }
 }

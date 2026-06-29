@@ -9,7 +9,13 @@ import { getErpAdapter, type ErpEntity, type ErpOp } from "@/lib/erp/adapter";
  */
 export async function processErpOutbox(limit = 50) {
   const db = createAdminClient();
-  const adapter = getErpAdapter();
+
+  // DB 설정 우선 적용(없으면 환경변수)
+  const { data: cfg } = await db.from("erp_config").select("adapter, base_url, api_key, enabled").eq("id", 1).maybeSingle();
+  const config = cfg ? { adapter: cfg.adapter as string, baseUrl: cfg.base_url as string | null, apiKey: cfg.api_key as string | null, enabled: cfg.enabled as boolean } : undefined;
+  const adapter = getErpAdapter(config);
+  // 실연동(staging/rest)인데 '사용'이 꺼져 있으면 전송하지 않고 건너뜀(실수 방지)
+  const blockReal = config && config.adapter !== "mock" && !config.enabled;
 
   const { data: rows, error } = await db
     .from("erp_sync_outbox")
@@ -23,13 +29,15 @@ export async function processErpOutbox(limit = 50) {
   let ok = 0, failed = 0, skipped = 0;
 
   for (const r of rows as ErpOutboxRow[]) {
-    const result = await adapter.send({
-      entity: r.entity as ErpEntity,
-      entityId: r.entity_id,
-      op: r.op as ErpOp,
-      payload: r.payload ?? {},
-      externalRef: r.external_ref ?? `${r.entity}:${r.entity_id}:${r.op}`,
-    });
+    const result = blockReal
+      ? { ok: false, skipped: true as const }
+      : await adapter.send({
+          entity: r.entity as ErpEntity,
+          entityId: r.entity_id,
+          op: r.op as ErpOp,
+          payload: r.payload ?? {},
+          externalRef: r.external_ref ?? `${r.entity}:${r.entity_id}:${r.op}`,
+        });
 
     const patch: Record<string, unknown> = {
       attempts: r.attempts + 1,

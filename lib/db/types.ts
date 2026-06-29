@@ -247,6 +247,11 @@ export interface Database {
         Insert: { kind: string; pms_id: string; erp_code: string; note?: string | null; updated_at?: string };
         Update: Record<string, unknown>;
       };
+      erp_config: {
+        Row: { id: number; adapter: string; base_url: string | null; api_key: string | null; enabled: boolean; auto_sync: boolean; updated_at: string };
+        Insert: Record<string, unknown>;
+        Update: Record<string, unknown>;
+      };
       procurement_items: { Row: ProcurementItem; Insert: Insertable<ProcurementItem, "project_id" | "name">; Update: Partial<ProcurementItem> };
       notifications: { Row: Notification; Insert: Insertable<Notification, "user_id" | "type" | "title">; Update: Partial<Notification> };
       activity_log: { Row: ActivityLog; Insert: Insertable<ActivityLog, "entity" | "action">; Update: Partial<ActivityLog> };
