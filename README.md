@@ -94,6 +94,7 @@ supabase/migrations/
   0006_mnsi_eto.sql       수주 제조(ETO): 제품유형·기자재구매(롱리드)·FAT·단계 시드
   0007_users_roles.sql    회원·권한·시스템 관리자·멤버 초대 RPC
   0008_notifications_*.sql 알림·활동 로그(감사) + 이벤트 트리거
+  0009_erp_integration.sql ERP 연동(더존 ERP-iU/옴니이솔): 아웃박스·매핑·트리거
 demo/preview.html         백엔드 없이 도는 구동 미리보기
 ```
 
@@ -106,6 +107,7 @@ demo/preview.html         백엔드 없이 도는 구동 미리보기
 5. 개발 서버: `npm run dev`
 
 배포(PostgreSQL · 어디서나 접근 · GitHub 동기화)는 [`DEPLOYMENT.md`](./DEPLOYMENT.md) 참고.
+ERP 연동(더존 ERP-iU/옴니이솔) 설계·설정은 [`docs/ERP_INTEGRATION.md`](./docs/ERP_INTEGRATION.md) 참고.
 디자인은 www.syu.ai.kr의 화이트/네이비 기업형 톤을 따랐다(`app/globals.css`).
 
 > `0002_pgvector.sql`은 대규모 현장에서 "비슷한 안전 지적사항 찾기" 같은 의미 검색이 필요할 때

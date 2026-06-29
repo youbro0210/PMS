@@ -237,6 +237,16 @@ export interface Database {
       billings: { Row: Billing; Insert: Insertable<Billing, "project_id" | "period_no">; Update: Partial<Billing> };
       cost_entries: { Row: CostEntry; Insert: Insertable<CostEntry, "project_id" | "category" | "amount">; Update: Partial<CostEntry> };
       inspections: { Row: Inspection; Insert: Insertable<Inspection, "project_id" | "type">; Update: Partial<Inspection> };
+      erp_sync_outbox: {
+        Row: { id: string; project_id: string | null; entity: string; entity_id: string; op: string; payload: Record<string, unknown> | null; external_ref: string | null; status: string; attempts: number; erp_doc_no: string | null; error: string | null; created_at: string; processed_at: string | null };
+        Insert: Record<string, unknown>;
+        Update: Record<string, unknown>;
+      };
+      erp_mapping: {
+        Row: { id: string; kind: string; pms_id: string; erp_code: string; note: string | null; updated_at: string };
+        Insert: { kind: string; pms_id: string; erp_code: string; note?: string | null; updated_at?: string };
+        Update: Record<string, unknown>;
+      };
       procurement_items: { Row: ProcurementItem; Insert: Insertable<ProcurementItem, "project_id" | "name">; Update: Partial<ProcurementItem> };
       notifications: { Row: Notification; Insert: Insertable<Notification, "user_id" | "type" | "title">; Update: Partial<Notification> };
       activity_log: { Row: ActivityLog; Insert: Insertable<ActivityLog, "entity" | "action">; Update: Partial<ActivityLog> };
