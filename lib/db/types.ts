@@ -252,6 +252,11 @@ export interface Database {
         Insert: Record<string, unknown>;
         Update: Record<string, unknown>;
       };
+      erp_module_config: {
+        Row: { module: string; label: string; method: string; direction: string; enabled: boolean; endpoint: string | null; auth_key: string | null; field_map: Record<string, unknown>; updated_at: string };
+        Insert: Record<string, unknown>;
+        Update: Record<string, unknown>;
+      };
       procurement_items: { Row: ProcurementItem; Insert: Insertable<ProcurementItem, "project_id" | "name">; Update: Partial<ProcurementItem> };
       notifications: { Row: Notification; Insert: Insertable<Notification, "user_id" | "type" | "title">; Update: Partial<Notification> };
       activity_log: { Row: ActivityLog; Insert: Insertable<ActivityLog, "entity" | "action">; Update: Partial<ActivityLog> };
