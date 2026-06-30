@@ -42,6 +42,7 @@ export default function NewProjectPage() {
     advance_payment: "",
     advance_recovery_rate: "",
     retention_rate: "",
+    total_budget: "",
     description: "",
   });
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
@@ -79,7 +80,12 @@ export default function NewProjectPage() {
     }
 
     if (seedPhases) {
-      await supabase.rpc("seed_standard_phases", { p_project_id: projectId as string });
+      await supabase.rpc("seed_standard_phases", {
+        p_project_id: projectId as string,
+        p_start_date: f.start_date || null,
+        p_end_date: f.delivery_date || null,
+        p_total_budget: num(f.total_budget),
+      });
     }
     router.push(`/projects/${projectId}/board`);
   }
@@ -142,7 +148,11 @@ export default function NewProjectPage() {
                 <input className={input} style={inputStyle} value={f.contract_amount} onChange={money("contract_amount")} inputMode="numeric" placeholder="예: 1,800,000,000" />
               </div>
               <div>
-                <label className={label}>착수일</label>
+                <label className={label}>총 실행예산(원)</label>
+                <input className={input} style={inputStyle} value={f.total_budget} onChange={money("total_budget")} inputMode="numeric" placeholder="예: 1,500,000,000" />
+              </div>
+              <div>
+                <label className={label}>착수(예정)일</label>
                 <input type="date" className={input} style={inputStyle} value={f.start_date} onChange={set("start_date")} />
               </div>
               <div>
@@ -150,6 +160,9 @@ export default function NewProjectPage() {
                 <input type="date" className={input} style={inputStyle} value={f.delivery_date} onChange={set("delivery_date")} />
               </div>
             </div>
+            <p className="mt-2 text-xs" style={{ color: "var(--muted)" }}>
+              착수일·납기·총 실행예산을 입력하면, 표준 단계(설계·구매·제작·FAT…)에 일정과 예산이 가중치대로 자동 배분되어 간트차트·EVM이 바로 채워집니다. 세부 일정은 등록 후 간트 화면에서 단계별로 수정할 수 있습니다.
+            </p>
           </section>
 
           <section>

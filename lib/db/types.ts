@@ -371,7 +371,7 @@ export interface Database {
         Returns: number;
       };
       seed_standard_phases: {
-        Args: { p_project_id: string };
+        Args: { p_project_id: string; p_start_date?: string | null; p_end_date?: string | null; p_total_budget?: number | null };
         Returns: number;
       };
       find_user_by_email: {
