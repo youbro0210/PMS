@@ -11,7 +11,7 @@ import type Anthropic from "@anthropic-ai/sdk";
 export const tools: Anthropic.Tool[] = [
   {
     name: "get_progress_summary",
-    description: "수주 프로젝트의 단계별 진척 현황(계획 대비 실적, 지연 단계)을 조회한다.",
+    description: "수주 프로젝트의 단계별 진척 현황(계획 대비 실적, 지연 단계)과 각 단계의 계획 일정(시작일 planned_start·완료예정일 planned_end)을 조회한다. 설계·제작 등 특정 단계의 일정·시작일·완료예정일 질문에도 이 도구를 사용한다.",
     input_schema: { type: "object", properties: {} },
   },
   {

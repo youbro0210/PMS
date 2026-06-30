@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { ProjectNav } from "@/components/layout/ProjectNav";
 import { formatThousands, parseAmount } from "@/lib/format";
 import type { ProcurementItem, ProcurementStatus } from "@/lib/db/types";
 
@@ -63,6 +64,7 @@ export default function ProcurementPage() {
   return (
     <main>
       <SiteHeader />
+      <ProjectNav projectId={id} />
       <div className="mx-auto max-w-4xl px-6 py-10">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-xl font-semibold" style={{ color: "var(--navy)" }}>기자재 구매</h1>

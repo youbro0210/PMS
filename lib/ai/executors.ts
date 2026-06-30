@@ -112,13 +112,19 @@ async function getProgressSummary(ctx: ExecutorContext): Promise<ExecutorResult>
     .single();
   if (error) return { ok: false, reason: "error", message: error.message };
 
-  const { data: delayed } = await ctx.db
+  const { data: phases } = await ctx.db
     .from("work_packages")
-    .select("name, planned_progress, actual_progress")
-    .eq("project_id", ctx.projectId);
-  const behind = (delayed ?? []).filter((w) => w.actual_progress < w.planned_progress);
+    .select("code, name, planned_start, planned_end, planned_progress, actual_progress, status")
+    .eq("project_id", ctx.projectId)
+    .order("code", { ascending: true });
+  const list = phases ?? [];
+  const behind = list.filter((w) => w.actual_progress < w.planned_progress);
 
-  return { ok: true, data: { summary: data, delayed: behind }, message: "공정 현황을 조회했습니다." };
+  return {
+    ok: true,
+    data: { summary: data, phases: list, delayed: behind },
+    message: "공정 현황과 단계별 계획 일정을 조회했습니다.",
+  };
 }
 
 async function updateProgress(input: ToolInput, ctx: ExecutorContext): Promise<ExecutorResult> {

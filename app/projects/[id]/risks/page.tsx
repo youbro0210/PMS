@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { ProjectNav } from "@/components/layout/ProjectNav";
 import {
   type Risk, type RiskCategory, type RiskStatus,
   RISK_CATEGORY_LABELS, RISK_STATUS_LABELS,
@@ -87,6 +88,7 @@ export default function RisksPage() {
   return (
     <main>
       <SiteHeader />
+      <ProjectNav projectId={id} />
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-xl font-semibold" style={{ color: "var(--navy)" }}>리스크 관리</h1>

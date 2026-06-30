@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getProject, getWorkPackages, getEvmSummary, getEvmSnapshots } from "@/lib/db/queries";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { ProjectNav } from "@/components/layout/ProjectNav";
 import { EvmView } from "@/components/evm/EvmView";
 import type { EvmSummary, EvmSnapshot } from "@/lib/db/types";
 
@@ -16,6 +17,7 @@ export default async function EvmPage({ params }: { params: Promise<{ id: string
   return (
     <main>
       <SiteHeader />
+      <ProjectNav projectId={id} />
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
         <div className="mb-6 flex items-center justify-between">
           <div>

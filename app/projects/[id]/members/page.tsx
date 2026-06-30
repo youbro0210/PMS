@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { ProjectNav } from "@/components/layout/ProjectNav";
 import { ROLE_LABELS, type MemberRole } from "@/lib/db/types";
 
 interface Row {
@@ -66,6 +67,7 @@ export default function MembersPage() {
   return (
     <main>
       <SiteHeader />
+      <ProjectNav projectId={id} />
       <div className="mx-auto max-w-3xl px-6 py-10">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-xl font-semibold" style={{ color: "var(--navy)" }}>멤버 · 권한 관리</h1>

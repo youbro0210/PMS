@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getProject, getWorkPackages } from "@/lib/db/queries";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { ProjectNav } from "@/components/layout/ProjectNav";
 import { SchedulePlanner } from "@/components/schedule/SchedulePlanner";
 
 export default async function SchedulePage({ params }: { params: Promise<{ id: string }> }) {
@@ -10,6 +11,7 @@ export default async function SchedulePage({ params }: { params: Promise<{ id: s
   return (
     <main>
       <SiteHeader />
+      <ProjectNav projectId={id} />
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
         <div className="mb-6 flex items-center justify-between">
           <div>

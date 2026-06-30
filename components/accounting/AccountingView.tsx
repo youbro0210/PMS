@@ -16,19 +16,23 @@ interface DraftLine { account: string; debit: string; credit: string; desc: stri
 
 /** 회계 전표 화면 — 시산표 + 전표/분개 목록 + 수동 전표 입력 */
 export function AccountingView({
-  projectId, vouchers, summary, codes,
+  projectId, vouchers, summary, codes, projects = [],
 }: {
   projectId: string;
   vouchers: JournalVoucher[];
   summary: AccountSummary[];
   codes: AccountCode[];
+  projects?: { id: string; name: string }[];
 }) {
   const router = useRouter();
   const supabase = createClient();
   const [open, setOpen] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [genBusy, setGenBusy] = useState(false);
+  const [genMsg, setGenMsg] = useState<string | null>(null);
   const [head, setHead] = useState({ date: new Date().toISOString().slice(0, 10), type: "transfer" as VoucherType, desc: "" });
+  const [voucherProjectId, setVoucherProjectId] = useState(projectId);
   const [lines, setLines] = useState<DraftLine[]>([
     { account: codes[0]?.code ?? "", debit: "", credit: "", desc: "" },
     { account: codes[0]?.code ?? "", debit: "", credit: "", desc: "" },
@@ -51,6 +55,57 @@ export function AccountingView({
     setLines((p) => p.map((l, idx) => (idx === i ? { ...l, [k]: v } : l)));
   }
 
+  const num = (s: string) => Number((s || "").replace(/,/g, "")) || 0;
+
+  // 차변 입력 시 같은 행 대변을 비우고, 다른(비어있는) 행 대변을 자동으로 채워 균형 맞춤
+  function setDebit(i: number, raw: string) {
+    const v = formatThousands(raw);
+    setLines((prev) => {
+      const next = prev.map((l, idx) => (idx === i ? { ...l, debit: v, credit: "" } : l));
+      const dTot = next.reduce((a, l) => a + num(l.debit), 0);
+      const targets = next.map((l, idx) => ({ l, idx })).filter((x) => x.idx !== i && num(x.l.debit) === 0);
+      if (targets.length) {
+        const t = targets[targets.length - 1].idx;
+        const others = next.reduce((a, l, idx) => (idx === t ? a : a + num(l.credit)), 0);
+        const fill = dTot - others;
+        next[t] = { ...next[t], credit: fill > 0 ? formatThousands(String(fill)) : "" };
+      }
+      return next;
+    });
+  }
+  // 대변 입력 시 반대로 자동 채움
+  function setCredit(i: number, raw: string) {
+    const v = formatThousands(raw);
+    setLines((prev) => {
+      const next = prev.map((l, idx) => (idx === i ? { ...l, credit: v, debit: "" } : l));
+      const cTot = next.reduce((a, l) => a + num(l.credit), 0);
+      const targets = next.map((l, idx) => ({ l, idx })).filter((x) => x.idx !== i && num(x.l.credit) === 0);
+      if (targets.length) {
+        const t = targets[targets.length - 1].idx;
+        const others = next.reduce((a, l, idx) => (idx === t ? a : a + num(l.debit)), 0);
+        const fill = cTot - others;
+        next[t] = { ...next[t], debit: fill > 0 ? formatThousands(String(fill)) : "" };
+      }
+      return next;
+    });
+  }
+
+  async function removeVoucher(v: JournalVoucher) {
+    if (!confirm(`전표 ${v.voucher_no ?? ""} (${won(v.total_amount)})를 삭제할까요?`)) return;
+    const { error } = await supabase.from("journal_vouchers").delete().eq("id", v.id);
+    if (error) { setErr(error.message); return; }
+    router.refresh();
+  }
+
+  async function generate() {
+    setGenBusy(true); setGenMsg(null); setErr(null);
+    const { data, error } = await supabase.rpc("acct_backfill_project", { p_project_id: projectId });
+    setGenBusy(false);
+    if (error) { setErr(error.message); return; }
+    setGenMsg(`기성·원가·구매·선급금 데이터로 전표 ${data ?? 0}건을 생성/동기화했습니다.`);
+    router.refresh();
+  }
+
   async function save() {
     setErr(null);
     if (!balanced) { setErr("차변 합계와 대변 합계가 같아야 하며 0보다 커야 합니다."); return; }
@@ -59,7 +114,7 @@ export function AccountingView({
       .filter((l) => l.account && (l.debit || l.credit))
       .map((l) => ({ account: l.account, debit: Number(l.debit.replace(/,/g, "") || 0), credit: Number(l.credit.replace(/,/g, "") || 0), desc: l.desc || null }));
     const { error } = await supabase.rpc("acct_create_voucher", {
-      p_project_id: projectId, p_type: head.type, p_date: head.date, p_desc: head.desc || null,
+      p_project_id: voucherProjectId, p_type: head.type, p_date: head.date, p_desc: head.desc || null,
       p_source: "manual", p_source_id: null, p_lines: payload,
     });
     setBusy(false);
@@ -108,14 +163,25 @@ export function AccountingView({
       <section>
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-sm font-medium">전표 / 분개 ({vouchers.length})</h2>
-          <button onClick={() => setOpen((v) => !v)} className="rounded-md px-3 py-1.5 text-sm font-medium text-white" style={{ background: "var(--accent)" }}>
-            {open ? "닫기" : "+ 수동 전표"}
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={generate} disabled={genBusy} className="rounded-md border px-3 py-1.5 text-sm font-medium disabled:opacity-50" style={{ borderColor: "var(--accent)", color: "var(--accent)" }}>
+              {genBusy ? "생성 중…" : "자동전표 생성"}
+            </button>
+            <button onClick={() => setOpen((v) => !v)} className="rounded-md px-3 py-1.5 text-sm font-medium text-white" style={{ background: "var(--accent)" }}>
+              {open ? "닫기" : "+ 수동 전표"}
+            </button>
+          </div>
         </div>
+        {genMsg && <p className="mb-2 text-xs" style={{ color: "#1d9e75" }}>{genMsg}</p>}
 
         {open && (
           <div className="mb-4 space-y-3 rounded-xl border p-4" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
             <div className="flex flex-wrap gap-3">
+              <label className="text-xs">프로젝트
+                <select className={`${input} ml-1`} style={style} value={voucherProjectId} onChange={(e) => setVoucherProjectId(e.target.value)}>
+                  {(projects.length ? projects : [{ id: projectId, name: "현재 프로젝트" }]).map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                </select>
+              </label>
               <label className="text-xs">전표일<input type="date" className={`${input} ml-1`} style={style} value={head.date} onChange={(e) => setHead({ ...head, date: e.target.value })} /></label>
               <label className="text-xs">유형
                 <select className={`${input} ml-1`} style={style} value={head.type} onChange={(e) => setHead({ ...head, type: e.target.value as VoucherType })}>
@@ -134,8 +200,8 @@ export function AccountingView({
                         {codes.map((c) => <option key={c.code} value={c.code}>{c.code} {c.name}</option>)}
                       </select>
                     </td>
-                    <td className="px-1 py-1"><input className={`${input} w-28`} style={style} inputMode="numeric" value={l.debit} onChange={(e) => setLine(i, "debit", formatThousands(e.target.value))} /></td>
-                    <td className="px-1 py-1"><input className={`${input} w-28`} style={style} inputMode="numeric" value={l.credit} onChange={(e) => setLine(i, "credit", formatThousands(e.target.value))} /></td>
+                    <td className="px-1 py-1"><input className={`${input} w-28`} style={style} inputMode="numeric" value={l.debit} onChange={(e) => setDebit(i, e.target.value)} /></td>
+                    <td className="px-1 py-1"><input className={`${input} w-28`} style={style} inputMode="numeric" value={l.credit} onChange={(e) => setCredit(i, e.target.value)} /></td>
                     <td className="px-1 py-1"><input className={`${input} w-full`} style={style} value={l.desc} onChange={(e) => setLine(i, "desc", e.target.value)} /></td>
                     <td className="px-1 py-1">{lines.length > 2 && <button onClick={() => setLines((p) => p.filter((_, idx) => idx !== i))} className="text-red-500">×</button>}</td>
                   </tr>
@@ -161,7 +227,10 @@ export function AccountingView({
                   <span style={{ color: "var(--muted)" }}>· {VOUCHER_SOURCE_LABELS[v.source] ?? v.source}</span>
                   {v.description && <span>· {v.description}</span>}
                 </div>
-                <span className="font-medium">{won(v.total_amount)}</span>
+                <div className="flex items-center gap-3">
+                  <span className="font-medium">{won(v.total_amount)}</span>
+                  <button onClick={() => removeVoucher(v)} className="text-red-500">삭제</button>
+                </div>
               </div>
               <table className="mt-2 w-full text-xs">
                 <tbody>
@@ -179,7 +248,7 @@ export function AccountingView({
           {vouchers.length === 0 && <p className="rounded-lg border p-6 text-center text-sm" style={{ background: "var(--surface)", borderColor: "var(--border)", color: "var(--muted)" }}>등록된 전표가 없습니다.</p>}
         </div>
         <p className="mt-2 text-xs" style={{ color: "var(--muted)" }}>
-          기성 확정·수금, 원가, 구매 입고, 선급금은 자동 분개됩니다(부가세 10%). 전표는 ERP 회계 모듈로 전송 큐에 적재됩니다.
+          기성 확정·수금, 원가, 구매 입고, 선급금은 자동 분개됩니다. 기존 데이터는 &ldquo;자동전표 생성&rdquo;으로 일괄 전표화하세요. 수금은 보통예금·유보금·선수금 정산으로 차/대변이 일치합니다. 현금·받을어음 등은 수동 전표에서 선택할 수 있고, 전표는 ERP 회계 모듈로 전송 큐에 적재됩니다.
         </p>
       </section>
     </div>

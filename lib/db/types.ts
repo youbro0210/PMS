@@ -457,6 +457,10 @@ export interface Database {
         Args: { p_project_id: string; p_type: string; p_date: string | null; p_desc: string | null; p_source: string; p_source_id: string | null; p_lines: unknown };
         Returns: string;
       };
+      acct_backfill_project: {
+        Args: { p_project_id: string };
+        Returns: number;
+      };
     };
   };
 }
