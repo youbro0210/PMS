@@ -72,3 +72,33 @@ export async function getProcurementSummary(projectId: string) {
     .maybeSingle();
   return data;
 }
+
+export async function getEvmSummary(projectId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("evm_summary")
+    .select("*")
+    .eq("project_id", projectId)
+    .maybeSingle();
+  return data;
+}
+
+export async function getEvmSnapshots(projectId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("evm_snapshots")
+    .select("*")
+    .eq("project_id", projectId)
+    .order("snapshot_date", { ascending: true });
+  return data ?? [];
+}
+
+export async function getRisks(projectId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("risk_register")
+    .select("*")
+    .eq("project_id", projectId)
+    .order("score", { ascending: false });
+  return data ?? [];
+}

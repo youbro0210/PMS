@@ -47,6 +47,27 @@ export function SiteDashboard({
       </section>
 
       <section>
+        <h2 className="mb-3 text-sm font-medium">핵심 지표 차트</h2>
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <ChartCard title="종합 진척">
+            <Gauge value={progress?.actual_progress ?? 0} ref2={progress?.planned_progress ?? 0}
+              color={(progress?.variance ?? 0) >= 0 ? "#1d9e75" : "#f59e0b"} caption={`계획 ${progress?.planned_progress ?? 0}%`} />
+          </ChartCard>
+          <ChartCard title="원가 집행률">
+            <Gauge value={cost?.execution_rate ?? 0} color={(cost?.execution_rate ?? 0) > 100 ? "#ef4444" : "var(--accent)"}
+              caption={won(cost?.cost_total)} />
+          </ChartCard>
+          <ChartCard title="기자재 입고율">
+            <Gauge value={procurement?.received_rate ?? 0} color={(procurement?.long_lead_overdue ?? 0) > 0 ? "#f59e0b" : "#1d9e75"}
+              caption={`${procurement?.received_count ?? 0}/${procurement?.item_count ?? 0}건`} />
+          </ChartCard>
+          <ChartCard title="누계 대금률">
+            <Gauge value={billing?.billed_rate ?? 0} color="#3b4658" caption={`${billing?.latest_period ?? 0}회차`} />
+          </ChartCard>
+        </div>
+      </section>
+
+      <section>
         <h2 className="mb-3 text-sm font-medium">단계별 진척</h2>
         <div className="space-y-2">
           {works.length === 0 && <p className="text-sm" style={{ color: "var(--muted)" }}>등록된 공종이 없습니다.</p>}
@@ -81,6 +102,35 @@ function Metric({ label, value, sub, subColor }: { label: string; value: string;
       <div className="mt-1 text-2xl font-semibold">{value}</div>
       {sub && <div className="mt-1 text-xs" style={{ color: subColor ?? "var(--muted)" }}>{sub}</div>}
     </div>
+  );
+}
+
+function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col items-center rounded-xl p-4" style={{ background: "var(--surface)" }}>
+      <div className="mb-2 self-start text-xs" style={{ color: "var(--muted)" }}>{title}</div>
+      {children}
+    </div>
+  );
+}
+
+/** 도넛 게이지 — value(%) 진행, ref2=계획 마커(선택) */
+function Gauge({ value, ref2, color, caption }: { value: number; ref2?: number; color: string; caption?: string }) {
+  const R = 34, C = 2 * Math.PI * R;
+  const pct = Math.max(0, Math.min(100, value));
+  const off = C * (1 - pct / 100);
+  const refAngle = ref2 != null ? (Math.min(100, Math.max(0, ref2)) / 100) * 360 - 90 : null;
+  const rx = refAngle != null ? 50 + R * Math.cos((refAngle * Math.PI) / 180) : 0;
+  const ry = refAngle != null ? 50 + R * Math.sin((refAngle * Math.PI) / 180) : 0;
+  return (
+    <svg viewBox="0 0 100 100" className="h-24 w-24">
+      <circle cx="50" cy="50" r={R} fill="none" stroke="var(--border)" strokeWidth="9" />
+      <circle cx="50" cy="50" r={R} fill="none" stroke={color} strokeWidth="9" strokeLinecap="round"
+        strokeDasharray={C} strokeDashoffset={off} transform="rotate(-90 50 50)" />
+      {refAngle != null && <circle cx={rx} cy={ry} r="3" fill="#3b4658" />}
+      <text x="50" y="48" textAnchor="middle" fontSize="19" fontWeight="600" fill="var(--text)">{Math.round(pct)}%</text>
+      {caption && <text x="50" y="63" textAnchor="middle" fontSize="8" fill="var(--muted)">{caption.length > 14 ? caption.slice(0, 13) + "…" : caption}</text>}
+    </svg>
   );
 }
 

@@ -86,6 +86,11 @@ export const tools: Anthropic.Tool[] = [
     },
   },
   {
+    name: "get_evm_summary",
+    description: "EVM 성과분석(PV/EV/AC, CPI 원가효율, SPI 일정효율, EAC 완료시점 예상원가, VAC 예산차이)을 조회한다. '성과', '원가효율', 'EVM', '완료 예상비용', 'SPI/CPI' 질문에 사용.",
+    input_schema: { type: "object", properties: {} },
+  },
+  {
     name: "search",
     description: "공종 또는 협력사를 키워드로 검색한다.",
     input_schema: {
@@ -106,5 +111,6 @@ export const TOOL_TO_INTENT: Record<string, string> = {
   log_inspection: "log_inspection",
   record_procurement: "record_procurement",
   get_procurement_status: "get_procurement_status",
+  get_evm_summary: "get_evm_summary",
   search: "search",
 };

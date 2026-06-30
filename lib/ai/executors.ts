@@ -98,6 +98,7 @@ export async function executeTool(name: string, input: ToolInput, ctx: ExecutorC
     case "log_inspection": return logInspection(input, ctx);
     case "record_procurement": return recordProcurement(input, ctx);
     case "get_procurement_status": return getProcurementStatus(ctx);
+    case "get_evm_summary": return getEvmSummary(ctx);
     case "search": return search(input, ctx);
     default: return { ok: false, reason: "error", message: `알 수 없는 도구: ${name}` };
   }
@@ -320,6 +321,21 @@ async function getProcurementStatus(ctx: ExecutorContext): Promise<ExecutorResul
     .not("status", "in", "(received,inspected)");
 
   return { ok: true, data: { summary: data ?? { item_count: 0 }, long_lead: overdue ?? [] }, message: "기자재 구매 현황을 조회했습니다." };
+}
+
+async function getEvmSummary(ctx: ExecutorContext): Promise<ExecutorResult> {
+  const { data, error } = await ctx.db
+    .from("evm_summary")
+    .select("*")
+    .eq("project_id", ctx.projectId)
+    .maybeSingle();
+  if (error) return { ok: false, reason: "error", message: error.message };
+  if (!data) return { ok: true, data: { evm: null }, message: "EVM 데이터가 없습니다." };
+
+  const fmt = (n: number | null | undefined) => (n == null ? "-" : Math.round(n).toLocaleString("ko-KR") + "원");
+  const cpi = data.cpi, spi = data.spi;
+  const note = `CPI ${cpi != null ? cpi.toFixed(2) : "-"}(${(cpi ?? 0) >= 1 ? "원가효율 양호" : "원가초과"}) · SPI ${spi != null ? spi.toFixed(2) : "-"}(${(spi ?? 0) >= 1 ? "일정 정상/선행" : "일정지연"}) · EAC ${fmt(data.eac)} · VAC ${fmt(data.vac)}(${(data.vac ?? 0) >= 0 ? "예산 내" : "초과 예상"})`;
+  return { ok: true, data: { evm: data }, message: `EVM 성과: PV ${fmt(data.pv)}, EV ${fmt(data.ev)}, AC ${fmt(data.ac)}. ${note}` };
 }
 
 async function search(input: ToolInput, ctx: ExecutorContext): Promise<ExecutorResult> {

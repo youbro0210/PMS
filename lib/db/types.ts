@@ -34,7 +34,67 @@ export type AiIntent =
   | "get_billing_status" | "record_billing"
   | "get_cost_summary" | "log_inspection"
   | "record_procurement" | "get_procurement_status"
+  | "get_evm_summary"
   | "search" | "unknown";
+
+export type RiskCategory =
+  | "schedule" | "cost" | "quality" | "procurement" | "safety" | "external";
+export type RiskStatus = "open" | "mitigating" | "closed";
+
+export const RISK_CATEGORY_LABELS: Record<RiskCategory, string> = {
+  schedule: "일정", cost: "원가", quality: "품질",
+  procurement: "구매/납기", safety: "안전", external: "대외/계약",
+};
+export const RISK_STATUS_LABELS: Record<RiskStatus, string> = {
+  open: "식별", mitigating: "대응 중", closed: "종결",
+};
+
+export interface Risk {
+  id: string;
+  project_id: string;
+  title: string;
+  category: RiskCategory;
+  probability: number;        // 1~5
+  impact: number;             // 1~5
+  score: number;              // probability × impact (생성열)
+  status: RiskStatus;
+  owner_id: string | null;
+  mitigation: string | null;
+  due_date: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EvmSummary {
+  project_id: string;
+  bac: number;                // 완료시점 예산(실행예산 합계)
+  ac: number;                 // 실제원가
+  planned_pct: number;
+  actual_pct: number;
+  pv: number;                 // 계획가치
+  ev: number;                 // 획득가치
+  cpi: number | null;         // 원가성과지수 EV/AC
+  spi: number | null;         // 일정성과지수 EV/PV
+  eac: number;                // 완료시점 예상원가
+  etc: number;                // 잔여 예상원가
+  vac: number;                // 완료시점 차이(BAC-EAC)
+  sv: number;                 // 일정차이 EV-PV
+  cv: number;                 // 원가차이 EV-AC
+}
+
+export interface EvmSnapshot {
+  id: string;
+  project_id: string;
+  snapshot_date: string;
+  bac: number;
+  pv: number;
+  ev: number;
+  ac: number;
+  cpi: number | null;
+  spi: number | null;
+  created_at: string;
+}
 
 export interface Profile {
   id: string;
@@ -258,6 +318,8 @@ export interface Database {
         Update: Record<string, unknown>;
       };
       procurement_items: { Row: ProcurementItem; Insert: Insertable<ProcurementItem, "project_id" | "name">; Update: Partial<ProcurementItem> };
+      risk_register: { Row: Risk; Insert: Insertable<Risk, "project_id" | "title">; Update: Partial<Risk> };
+      evm_snapshots: { Row: EvmSnapshot; Insert: Insertable<EvmSnapshot, "project_id">; Update: Partial<EvmSnapshot> };
       notifications: { Row: Notification; Insert: Insertable<Notification, "user_id" | "type" | "title">; Update: Partial<Notification> };
       activity_log: { Row: ActivityLog; Insert: Insertable<ActivityLog, "entity" | "action">; Update: Partial<ActivityLog> };
       ai_action_logs: { Row: AiActionLog; Insert: Insertable<AiActionLog, "input_text">; Update: Partial<AiActionLog> };
@@ -278,6 +340,7 @@ export interface Database {
       procurement_summary: {
         Row: { project_id: string; item_count: number; received_count: number; long_lead_count: number; long_lead_overdue: number; received_rate: number | null; procurement_total: number | null };
       };
+      evm_summary: { Row: EvmSummary };
     };
     Functions: {
       create_project: {
@@ -326,6 +389,10 @@ export interface Database {
       admin_set_user_admin: {
         Args: { p_user_id: string; p_is_admin: boolean };
         Returns: undefined;
+      };
+      capture_evm_snapshot: {
+        Args: { p_project_id: string };
+        Returns: string;
       };
     };
   };
