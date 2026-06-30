@@ -81,9 +81,9 @@ begin
 end; $$;
 
 alter table public.evm_snapshots enable row level security;
-create policy "스냅샷 조회" on public.evm_snapshots for select using (public.is_project_member(project_id));
-create policy "스냅샷 등록" on public.evm_snapshots for insert with check (public.get_project_role(project_id) not in ('viewer'));
-create policy "스냅샷 삭제" on public.evm_snapshots for delete using (public.get_project_role(project_id) in ('owner','manager'));
+create policy "스냅샷 조회" on public.evm_snapshots for select using (public.is_project_member(project_id) or public.is_system_admin());
+create policy "스냅샷 등록" on public.evm_snapshots for insert with check (public.is_system_admin() or public.get_project_role(project_id) not in ('viewer'));
+create policy "스냅샷 삭제" on public.evm_snapshots for delete using (public.is_system_admin() or public.get_project_role(project_id) in ('owner','manager'));
 
 -- ============================================================
 -- B. 리스크 등록부
@@ -107,10 +107,10 @@ create table public.risk_register (
 create index if not exists idx_risk_project on public.risk_register(project_id, status);
 
 alter table public.risk_register enable row level security;
-create policy "리스크 조회" on public.risk_register for select using (public.is_project_member(project_id));
-create policy "리스크 등록" on public.risk_register for insert with check (public.get_project_role(project_id) not in ('viewer'));
-create policy "리스크 수정" on public.risk_register for update using (public.get_project_role(project_id) not in ('viewer'));
-create policy "리스크 삭제" on public.risk_register for delete using (public.get_project_role(project_id) in ('owner','manager'));
+create policy "리스크 조회" on public.risk_register for select using (public.is_project_member(project_id) or public.is_system_admin());
+create policy "리스크 등록" on public.risk_register for insert with check (public.is_system_admin() or public.get_project_role(project_id) not in ('viewer'));
+create policy "리스크 수정" on public.risk_register for update using (public.is_system_admin() or public.get_project_role(project_id) not in ('viewer'));
+create policy "리스크 삭제" on public.risk_register for delete using (public.is_system_admin() or public.get_project_role(project_id) in ('owner','manager'));
 
 create or replace function public.on_risk_created()
 returns trigger language plpgsql security definer set search_path = public as $$

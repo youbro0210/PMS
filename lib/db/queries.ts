@@ -102,3 +102,30 @@ export async function getRisks(projectId: string) {
     .order("score", { ascending: false });
   return data ?? [];
 }
+
+export async function getVouchers(projectId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("journal_vouchers")
+    .select("*, journal_lines(*)")
+    .eq("project_id", projectId)
+    .order("voucher_date", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(200);
+  return data ?? [];
+}
+
+export async function getAccountSummary(projectId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("account_summary")
+    .select("*")
+    .eq("project_id", projectId);
+  return data ?? [];
+}
+
+export async function getAccountCodes() {
+  const supabase = await createClient();
+  const { data } = await supabase.from("account_codes").select("*").order("code");
+  return data ?? [];
+}

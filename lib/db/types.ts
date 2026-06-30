@@ -96,6 +96,61 @@ export interface EvmSnapshot {
   created_at: string;
 }
 
+export type AccountType = "asset" | "liability" | "equity" | "revenue" | "expense";
+export type VoucherType = "sales" | "purchase" | "receipt" | "payment" | "transfer";
+
+export const ACCOUNT_TYPE_LABELS: Record<AccountType, string> = {
+  asset: "자산", liability: "부채", equity: "자본", revenue: "수익", expense: "비용",
+};
+export const VOUCHER_TYPE_LABELS: Record<VoucherType, string> = {
+  sales: "매출", purchase: "매입", receipt: "입금", payment: "출금", transfer: "대체",
+};
+export const VOUCHER_SOURCE_LABELS: Record<string, string> = {
+  billing: "기성/수금", cost: "원가", procurement: "구매입고", advance: "선급금", manual: "수동",
+};
+
+export interface AccountCode {
+  code: string;
+  name: string;
+  type: AccountType;
+}
+
+export interface JournalLine {
+  id: string;
+  voucher_id: string;
+  line_no: number;
+  account_code: string;
+  debit: number;
+  credit: number;
+  description: string | null;
+}
+
+export interface JournalVoucher {
+  id: string;
+  project_id: string;
+  voucher_no: string | null;
+  voucher_date: string;
+  type: VoucherType;
+  description: string | null;
+  source: string;
+  source_id: string | null;
+  status: string;
+  total_amount: number;
+  created_by: string | null;
+  created_at: string;
+  journal_lines?: JournalLine[];
+}
+
+export interface AccountSummary {
+  project_id: string;
+  account_code: string;
+  account_name: string;
+  type: AccountType;
+  debit_total: number;
+  credit_total: number;
+  balance: number;
+}
+
 export interface Profile {
   id: string;
   email: string;
@@ -320,6 +375,9 @@ export interface Database {
       procurement_items: { Row: ProcurementItem; Insert: Insertable<ProcurementItem, "project_id" | "name">; Update: Partial<ProcurementItem> };
       risk_register: { Row: Risk; Insert: Insertable<Risk, "project_id" | "title">; Update: Partial<Risk> };
       evm_snapshots: { Row: EvmSnapshot; Insert: Insertable<EvmSnapshot, "project_id">; Update: Partial<EvmSnapshot> };
+      account_codes: { Row: AccountCode; Insert: AccountCode; Update: Partial<AccountCode> };
+      journal_vouchers: { Row: JournalVoucher; Insert: Insertable<JournalVoucher, "project_id" | "type">; Update: Partial<JournalVoucher> };
+      journal_lines: { Row: JournalLine; Insert: Insertable<JournalLine, "voucher_id" | "account_code">; Update: Partial<JournalLine> };
       notifications: { Row: Notification; Insert: Insertable<Notification, "user_id" | "type" | "title">; Update: Partial<Notification> };
       activity_log: { Row: ActivityLog; Insert: Insertable<ActivityLog, "entity" | "action">; Update: Partial<ActivityLog> };
       ai_action_logs: { Row: AiActionLog; Insert: Insertable<AiActionLog, "input_text">; Update: Partial<AiActionLog> };
@@ -341,6 +399,7 @@ export interface Database {
         Row: { project_id: string; item_count: number; received_count: number; long_lead_count: number; long_lead_overdue: number; received_rate: number | null; procurement_total: number | null };
       };
       evm_summary: { Row: EvmSummary };
+      account_summary: { Row: AccountSummary };
     };
     Functions: {
       create_project: {
@@ -392,6 +451,10 @@ export interface Database {
       };
       capture_evm_snapshot: {
         Args: { p_project_id: string };
+        Returns: string;
+      };
+      acct_create_voucher: {
+        Args: { p_project_id: string; p_type: string; p_date: string | null; p_desc: string | null; p_source: string; p_source_id: string | null; p_lines: unknown };
         Returns: string;
       };
     };

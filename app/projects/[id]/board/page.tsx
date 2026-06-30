@@ -40,6 +40,7 @@ export default async function SitePage({ params }: { params: Promise<{ id: strin
           <Link href={`/projects/${id}/risks`}>리스크</Link>
           <Link href={`/projects/${id}/billings`}>대금</Link>
           <Link href={`/projects/${id}/procurement`}>구매</Link>
+          <Link href={`/projects/${id}/accounting`}>회계</Link>
           <Link href={`/projects/${id}/activity`}>활동</Link>
           <Link href={`/projects/${id}/members`}>멤버</Link>
         </nav>
