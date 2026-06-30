@@ -1,4 +1,3 @@
 const ts=require('./node_modules/typescript');const fs=require('fs');
-const f='components/accounting/AccountingView.tsx';
-const s=fs.readFileSync(f,'utf8');const sf=ts.createSourceFile(f,s,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);const d=sf.parseDiagnostics||[];
-if(d.length){console.log('ERR');d.forEach(x=>console.log(' ',ts.flattenDiagnosticMessageText(x.messageText,'\n')));process.exit(1)}else console.log('OK '+f);
+const files=['lib/ai/executors.ts','lib/ai/tools.ts','lib/ai/prompts.ts','lib/db/types.ts'];
+let bad=0;for(const f of files){const s=fs.readFileSync(f,'utf8');const sf=ts.createSourceFile(f,s,ts.ScriptTarget.Latest,true,ts.ScriptKind.TS);const d=sf.parseDiagnostics||[];if(d.length){bad++;console.log('ERR',f);d.forEach(x=>console.log(' ',ts.flattenDiagnosticMessageText(x.messageText,'\n')))}else console.log('OK',f)}process.exit(bad?1:0);

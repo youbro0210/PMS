@@ -86,6 +86,11 @@ export const tools: Anthropic.Tool[] = [
     },
   },
   {
+    name: "get_accounting_summary",
+    description: "회계 전표·분개·증빙과 계정별 잔액(시산표), 기성·수금 회계 내역을 조회한다. '회계전표', '분개', '증빙', '계정 잔액', '시산표', '외상매출금/현금/공사매출 잔액', '회계 세부내역' 질문에 사용. 이 시스템 자체가 회계 전표를 보유하므로 외부 재무·회계 시스템으로 안내하지 말 것.",
+    input_schema: { type: "object", properties: {} },
+  },
+  {
     name: "get_evm_summary",
     description: "EVM 성과분석(PV/EV/AC, CPI 원가효율, SPI 일정효율, EAC 완료시점 예상원가, VAC 예산차이)을 조회한다. '성과', '원가효율', 'EVM', '완료 예상비용', 'SPI/CPI' 질문에 사용.",
     input_schema: { type: "object", properties: {} },
@@ -112,5 +117,6 @@ export const TOOL_TO_INTENT: Record<string, string> = {
   record_procurement: "record_procurement",
   get_procurement_status: "get_procurement_status",
   get_evm_summary: "get_evm_summary",
+  get_accounting_summary: "get_accounting_summary",
   search: "search",
 };

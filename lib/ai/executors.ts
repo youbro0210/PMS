@@ -99,6 +99,7 @@ export async function executeTool(name: string, input: ToolInput, ctx: ExecutorC
     case "record_procurement": return recordProcurement(input, ctx);
     case "get_procurement_status": return getProcurementStatus(ctx);
     case "get_evm_summary": return getEvmSummary(ctx);
+    case "get_accounting_summary": return getAccountingSummary(ctx);
     case "search": return search(input, ctx);
     default: return { ok: false, reason: "error", message: `알 수 없는 도구: ${name}` };
   }
@@ -342,6 +343,29 @@ async function getEvmSummary(ctx: ExecutorContext): Promise<ExecutorResult> {
   const cpi = data.cpi, spi = data.spi;
   const note = `CPI ${cpi != null ? cpi.toFixed(2) : "-"}(${(cpi ?? 0) >= 1 ? "원가효율 양호" : "원가초과"}) · SPI ${spi != null ? spi.toFixed(2) : "-"}(${(spi ?? 0) >= 1 ? "일정 정상/선행" : "일정지연"}) · EAC ${fmt(data.eac)} · VAC ${fmt(data.vac)}(${(data.vac ?? 0) >= 0 ? "예산 내" : "초과 예상"})`;
   return { ok: true, data: { evm: data }, message: `EVM 성과: PV ${fmt(data.pv)}, EV ${fmt(data.ev)}, AC ${fmt(data.ac)}. ${note}` };
+}
+
+async function getAccountingSummary(ctx: ExecutorContext): Promise<ExecutorResult> {
+  const [{ data: accounts }, { data: vouchers }, { data: billing }] = await Promise.all([
+    ctx.db.from("account_summary").select("*").eq("project_id", ctx.projectId),
+    ctx.db
+      .from("journal_vouchers")
+      .select("voucher_no, voucher_date, type, source, description, total_amount, journal_lines(account_code, debit, credit, description)")
+      .eq("project_id", ctx.projectId)
+      .order("voucher_date", { ascending: false })
+      .limit(20),
+    ctx.db.from("billing_summary").select("*").eq("project_id", ctx.projectId).maybeSingle(),
+  ]);
+  const won = (n: number | null | undefined) => (n == null ? "0원" : Math.round(n).toLocaleString("ko-KR") + "원");
+  const acc = (accounts ?? []) as { account_code: string; account_name: string; balance: number }[];
+  const summary = acc.length
+    ? acc.map((a) => `${a.account_name} ${won(a.balance)}`).join(", ")
+    : "등록된 전표 없음";
+  return {
+    ok: true,
+    data: { accounts: acc, vouchers: vouchers ?? [], billing },
+    message: `회계 전표 ${(vouchers ?? []).length}건. 계정 잔액: ${summary}.`,
+  };
 }
 
 async function search(input: ToolInput, ctx: ExecutorContext): Promise<ExecutorResult> {

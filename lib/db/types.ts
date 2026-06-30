@@ -34,7 +34,7 @@ export type AiIntent =
   | "get_billing_status" | "record_billing"
   | "get_cost_summary" | "log_inspection"
   | "record_procurement" | "get_procurement_status"
-  | "get_evm_summary"
+  | "get_evm_summary" | "get_accounting_summary"
   | "search" | "unknown";
 
 export type RiskCategory =
