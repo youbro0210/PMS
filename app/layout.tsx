@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { FloatingLogout } from "@/components/layout/FloatingLogout";
 
 export const metadata: Metadata = {
   title: "MnSi PMS",
@@ -14,7 +15,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        {children}
+        <FloatingLogout />
+      </body>
     </html>
   );
 }
