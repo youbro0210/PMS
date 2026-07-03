@@ -163,6 +163,19 @@ export function BomView({ projectId, initial }: { projectId: string; initial: Bo
         </table>
       </div>
       <p className="text-xs" style={{ color: "var(--muted)" }}>단가를 입력하면 금액(단가×수량)이 자동 계산되고, 구매구분별 집계·예산 배부·PO 생성의 기준이 됩니다.</p>
+
+      {rows.length > 0 && (
+        <div className="sticky bottom-0 z-20 -mx-1 flex items-center justify-between gap-3 rounded-lg border px-4 py-3 shadow-lg"
+          style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+          <span className="text-sm" style={{ color: "var(--muted)" }}>총 {rows.length}행 · 합계 {won(totalAmount)}</span>
+          <div className="flex items-center gap-2">
+            <button onClick={add} className="rounded-md border px-3 py-2 text-sm font-medium" style={{ borderColor: "var(--border)" }}>+ 품목 추가</button>
+            <button onClick={saveAll} disabled={savingAll} className="rounded-md px-5 py-2 text-sm font-semibold text-white disabled:opacity-50" style={{ background: "var(--accent)" }}>
+              {savingAll ? "저장 중…" : "전체 저장"}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
