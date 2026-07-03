@@ -167,6 +167,7 @@ export interface BomItem {
   model: string | null;
   procure_type: ProcureType;
   level: number;
+  lead_time_weeks: number | null;
   unit_price: number | null;
   amount: number | null;
   drawing_no: string | null;
@@ -558,6 +559,10 @@ export interface Database {
       admin_delete_project: {
         Args: { p_project_id: string };
         Returns: undefined;
+      };
+      generate_pos_from_bom: {
+        Args: { p_project_id: string; p_basis?: string; p_anchor?: string | null };
+        Returns: number;
       };
     };
   };
