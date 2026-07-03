@@ -187,11 +187,16 @@ export interface BomSummary {
 
 export interface Resource {
   id: string;
+  employee_no: string | null;
   name: string;
+  rank: string | null;
+  department: string | null;
   trade: string | null;
   monthly_rate: number;
   capacity_pct: number;
   is_active: boolean;
+  email: string | null;
+  phone: string | null;
   note: string | null;
   created_at: string;
 }
@@ -210,7 +215,7 @@ export interface ProjectAssignment {
   note: string | null;
   created_at: string;
   updated_at: string;
-  resources?: { name: string; trade: string | null; monthly_rate: number } | null;
+  resources?: { employee_no?: string | null; name: string; rank?: string | null; trade: string | null; monthly_rate: number } | null;
 }
 
 export interface ProjectLaborSummary {
