@@ -63,7 +63,7 @@ begin
     values
       (p_project_id, r.id, r.description, r.size, r.qty, 'EA',
        coalesce(r.amount, r.unit_price * r.qty, 0), v_lt, v_order, v_eta, (v_lt >= 8),
-       case when p_basis = 'start' then 'ordered' else 'planned' end);
+       (case when p_basis = 'start' then 'ordered' else 'planned' end)::procurement_status);
     n := n + 1;
   end loop;
 
