@@ -16,6 +16,7 @@ export function BomView({ projectId, initial }: { projectId: string; initial: Bo
   const [rows, setRows] = useState<BomItem[]>(initial);
   const [err, setErr] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [savingAll, setSavingAll] = useState(false);
   const [basis, setBasis] = useState("delivery");
   const [anchor, setAnchor] = useState("");
   const [genBusy, setGenBusy] = useState(false);
@@ -47,6 +48,19 @@ export function BomView({ projectId, initial }: { projectId: string; initial: Bo
     }).eq("id", r.id);
     setSavingId(null);
     if (error) { setErr(error.message); return; }
+    await reload();
+  }
+  async function saveAll() {
+    setSavingAll(true); setErr(null);
+    const payload = rows.map((r) => ({
+      id: r.id, project_id: projectId, item_no: r.item_no, description: r.description, qty: r.qty,
+      size: r.size, manufacturer: r.manufacturer, model: r.model, procure_type: r.procure_type,
+      lead_time_weeks: r.lead_time_weeks,
+      unit_price: r.unit_price, amount: r.unit_price != null ? Number(r.unit_price) * Number(r.qty) : r.amount, note: r.note,
+    }));
+    const { error } = await supabase.from("bom_items").upsert(payload);
+    setSavingAll(false);
+    if (error) { setErr(`일괄 저장 실패: ${error.message}`); return; }
     await reload();
   }
   async function remove(r: BomItem) {
@@ -89,20 +103,29 @@ export function BomView({ projectId, initial }: { projectId: string; initial: Bo
       </section>
       <div className="flex items-center justify-between">
         <span className="text-sm" style={{ color: "var(--muted)" }}>BOM 총 {rows.length}행 · 합계 {won(totalAmount)}</span>
-        <button onClick={add} className="rounded-md px-3 py-1.5 text-sm font-medium text-white" style={{ background: "var(--accent)" }}>+ 품목 추가</button>
+        <div className="flex items-center gap-2">
+          <button onClick={saveAll} disabled={savingAll || rows.length === 0} className="rounded-md px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50" style={{ background: "var(--navy)" }}>{savingAll ? "저장 중…" : "전체 저장"}</button>
+          <button onClick={add} className="rounded-md px-3 py-1.5 text-sm font-medium text-white" style={{ background: "var(--accent)" }}>+ 품목 추가</button>
+        </div>
       </div>
 
-      <div className="flex flex-wrap items-end gap-2 rounded-lg border p-3" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-        <span className="text-xs font-medium">발주(PO) 자동생성</span>
-        <label className="text-xs">기준
-          <select className="ml-1 rounded border bg-transparent px-2 py-1 text-xs" style={style} value={basis} onChange={(e) => setBasis(e.target.value)}>
-            <option value="delivery">납기 역산</option>
-            <option value="start">착수 정산</option>
-          </select>
-        </label>
-        <label className="text-xs">{basis === "start" ? "착수일" : "납기일"}<input type="date" className="ml-1 rounded border bg-transparent px-2 py-1 text-xs" style={style} value={anchor} onChange={(e) => setAnchor(e.target.value)} /></label>
-        <button onClick={generatePOs} disabled={genBusy} className="rounded px-3 py-1 text-xs font-medium text-white disabled:opacity-50" style={{ background: "var(--accent)" }}>{genBusy ? "생성 중…" : "발주 생성"}</button>
-        <span className="text-[11px]" style={{ color: "var(--muted)" }}>구매품·외주품을 리드타임(L/T)으로 발주일·입고예정(ETA) 계산해 구매 탭에 생성. 비우면 프로젝트 납기/착수일 사용. 롱리드(L/T≥8주)는 임계경로 표시.</span>
+      <div className="rounded-lg border p-3" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <span className="text-sm font-semibold" style={{ color: "var(--navy)" }}>발주(PO) 자동생성</span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs" style={{ color: "var(--muted)" }}>기준</span>
+            <select className="rounded border bg-transparent px-2 py-1 text-xs" style={style} value={basis} onChange={(e) => setBasis(e.target.value)}>
+              <option value="delivery">납기 역산</option>
+              <option value="start">착수 정산</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs" style={{ color: "var(--muted)" }}>{basis === "start" ? "착수일" : "납기일"}</span>
+            <input type="date" className="rounded border bg-transparent px-2 py-1 text-xs" style={style} value={anchor} onChange={(e) => setAnchor(e.target.value)} />
+          </div>
+          <button onClick={generatePOs} disabled={genBusy} className="ml-auto rounded-md px-4 py-1.5 text-xs font-medium text-white disabled:opacity-50" style={{ background: "var(--accent)" }}>{genBusy ? "생성 중…" : "발주 생성"}</button>
+        </div>
+        <p className="mt-2 text-[11px] leading-relaxed" style={{ color: "var(--muted)" }}>구매품·외주품을 리드타임(L/T)으로 발주일·입고예정(ETA)을 계산해 구매 탭에 생성합니다. 날짜를 비우면 프로젝트 납기/착수일을 사용하며, 롱리드(L/T≥8주)는 임계경로로 표시됩니다.</p>
       </div>
       {genMsg && <p className="text-xs" style={{ color: "#1d9e75" }}>{genMsg} <button onClick={() => router.push(`/projects/${projectId}/procurement`)} style={{ color: "var(--accent)" }}>구매 탭 보기 →</button></p>}
       {err && <p className="text-sm text-red-500">{err}</p>}
