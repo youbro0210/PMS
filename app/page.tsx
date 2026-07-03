@@ -25,13 +25,22 @@ export default async function HomePage() {
       <section className="mx-auto max-w-5xl px-8 py-10">
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-lg font-semibold" style={{ color: "var(--navy)" }}>수주 목록</h2>
-          <Link
-            href="/projects/new"
-            className="rounded-md px-4 py-2 text-sm font-medium text-white"
-            style={{ background: "var(--accent)" }}
-          >
-            + 신규 수주 등록
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/projects/import"
+              className="rounded-md border px-4 py-2 text-sm font-medium"
+              style={{ borderColor: "var(--accent)", color: "var(--accent)" }}
+            >
+              도면으로 수주 생성
+            </Link>
+            <Link
+              href="/projects/new"
+              className="rounded-md px-4 py-2 text-sm font-medium text-white"
+              style={{ background: "var(--accent)" }}
+            >
+              + 신규 수주 등록
+            </Link>
+          </div>
         </div>
         {projects.length === 0 ? (
           <p style={{ color: "var(--muted)" }}>등록된 현장이 없습니다.</p>

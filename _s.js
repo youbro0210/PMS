@@ -1,3 +1,3 @@
 const ts=require('./node_modules/typescript');const fs=require('fs');
-const files=['lib/ai/executors.ts','lib/ai/tools.ts','lib/ai/prompts.ts','lib/db/types.ts'];
-let bad=0;for(const f of files){const s=fs.readFileSync(f,'utf8');const sf=ts.createSourceFile(f,s,ts.ScriptTarget.Latest,true,ts.ScriptKind.TS);const d=sf.parseDiagnostics||[];if(d.length){bad++;console.log('ERR',f);d.forEach(x=>console.log(' ',ts.flattenDiagnosticMessageText(x.messageText,'\n')))}else console.log('OK',f)}process.exit(bad?1:0);
+const files=['lib/ai/bom.ts','app/api/bom/extract/route.ts','app/projects/import/page.tsx','components/bom/BomView.tsx','app/projects/[id]/bom/page.tsx','lib/db/types.ts','lib/db/queries.ts','components/layout/ProjectNav.tsx','app/page.tsx'];
+let bad=0;for(const f of files){const s=fs.readFileSync(f,'utf8');const sf=ts.createSourceFile(f,s,ts.ScriptTarget.Latest,true,f.endsWith('tsx')?ts.ScriptKind.TSX:ts.ScriptKind.TS);const d=sf.parseDiagnostics||[];if(d.length){bad++;console.log('ERR',f);d.forEach(x=>console.log(' ',ts.flattenDiagnosticMessageText(x.messageText,'\n')))}else console.log('OK',f)}process.exit(bad?1:0);

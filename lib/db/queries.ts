@@ -93,6 +93,16 @@ export async function getEvmSnapshots(projectId: string) {
   return data ?? [];
 }
 
+export async function getBomItems(projectId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("bom_items")
+    .select("*")
+    .eq("project_id", projectId)
+    .order("item_no", { ascending: true });
+  return data ?? [];
+}
+
 export async function getRisks(projectId: string) {
   const supabase = await createClient();
   const { data } = await supabase

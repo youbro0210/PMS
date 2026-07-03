@@ -151,6 +151,50 @@ export interface AccountSummary {
   balance: number;
 }
 
+export type ProcureType = "purchase" | "outsource" | "inhouse";
+export const PROCURE_TYPE_LABELS: Record<ProcureType, string> = {
+  purchase: "구매품", outsource: "외주품", inhouse: "자사생산품",
+};
+
+export interface BomItem {
+  id: string;
+  project_id: string;
+  item_no: number | null;
+  description: string;
+  qty: number;
+  size: string | null;
+  manufacturer: string | null;
+  model: string | null;
+  procure_type: ProcureType;
+  level: number;
+  unit_price: number | null;
+  amount: number | null;
+  drawing_no: string | null;
+  source_page: number | null;
+  note: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BomSummary {
+  project_id: string;
+  procure_type: ProcureType;
+  item_count: number;
+  qty_total: number;
+  amount_total: number;
+}
+
+/** 도면에서 추출된 BOM 1행(저장 전 검토용) */
+export interface ExtractedBomRow {
+  item_no: number | null;
+  description: string;
+  qty: number;
+  size: string | null;
+  manufacturer: string | null;
+  model: string | null;
+  procure_type: ProcureType;
+}
+
 export interface Profile {
   id: string;
   email: string;
@@ -378,6 +422,7 @@ export interface Database {
       account_codes: { Row: AccountCode; Insert: AccountCode; Update: Partial<AccountCode> };
       journal_vouchers: { Row: JournalVoucher; Insert: Insertable<JournalVoucher, "project_id" | "type">; Update: Partial<JournalVoucher> };
       journal_lines: { Row: JournalLine; Insert: Insertable<JournalLine, "voucher_id" | "account_code">; Update: Partial<JournalLine> };
+      bom_items: { Row: BomItem; Insert: Insertable<BomItem, "project_id" | "description">; Update: Partial<BomItem> };
       notifications: { Row: Notification; Insert: Insertable<Notification, "user_id" | "type" | "title">; Update: Partial<Notification> };
       activity_log: { Row: ActivityLog; Insert: Insertable<ActivityLog, "entity" | "action">; Update: Partial<ActivityLog> };
       ai_action_logs: { Row: AiActionLog; Insert: Insertable<AiActionLog, "input_text">; Update: Partial<AiActionLog> };
@@ -400,6 +445,7 @@ export interface Database {
       };
       evm_summary: { Row: EvmSummary };
       account_summary: { Row: AccountSummary };
+      bom_summary: { Row: BomSummary };
     };
     Functions: {
       create_project: {

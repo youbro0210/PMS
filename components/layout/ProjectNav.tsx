@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 const TABS: { seg: string; label: string; admin?: boolean }[] = [
+  { seg: "bom", label: "BOM" },
   { seg: "schedule", label: "간트" },
   { seg: "evm", label: "EVM" },
   { seg: "risks", label: "리스크" },
