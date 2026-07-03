@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 const TABS: { seg: string; label: string; admin?: boolean }[] = [
   { seg: "bom", label: "BOM" },
   { seg: "schedule", label: "간트" },
+  { seg: "resources", label: "인력" },
   { seg: "evm", label: "EVM" },
   { seg: "risks", label: "리스크" },
   { seg: "billings", label: "대금" },

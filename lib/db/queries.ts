@@ -103,6 +103,34 @@ export async function getBomItems(projectId: string) {
   return data ?? [];
 }
 
+export async function getResources() {
+  const supabase = await createClient();
+  const { data } = await supabase.from("resources").select("*").order("is_active", { ascending: false }).order("name");
+  return data ?? [];
+}
+
+export async function getResourceUtilization() {
+  const supabase = await createClient();
+  const { data } = await supabase.from("resource_utilization").select("*").order("current_allocation_pct", { ascending: false });
+  return data ?? [];
+}
+
+export async function getProjectAssignments(projectId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("project_assignments")
+    .select("*, resources(name, trade, monthly_rate)")
+    .eq("project_id", projectId)
+    .order("created_at", { ascending: true });
+  return data ?? [];
+}
+
+export async function getProjectLaborSummary(projectId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase.from("project_labor_summary").select("*").eq("project_id", projectId).maybeSingle();
+  return data;
+}
+
 export async function getRisks(projectId: string) {
   const supabase = await createClient();
   const { data } = await supabase

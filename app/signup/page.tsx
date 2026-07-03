@@ -37,7 +37,7 @@ export default function SignupPage() {
   return (
     <main className="flex min-h-screen items-center justify-center p-6">
       <div className="w-full max-w-sm rounded-xl border p-8" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-        <div className="syu-logo mb-1 text-2xl">MnSi<span style={{ color: "var(--accent)" }}>·</span>PMS</div>
+        <div className="syu-logo mb-1 text-2xl">SYU<span style={{ color: "var(--accent)" }}>·</span>PMS</div>
         <h1 className="mb-5 text-lg font-semibold" style={{ color: "var(--navy)" }}>회원가입</h1>
 
         {done ? (

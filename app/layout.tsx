@@ -3,7 +3,7 @@ import "./globals.css";
 import { FloatingLogout } from "@/components/layout/FloatingLogout";
 
 export const metadata: Metadata = {
-  title: "MnSi PMS",
+  title: "SYU PMS",
   description: "자연어로 관리하는 수주 프로젝트 관리 시스템",
 };
 

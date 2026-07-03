@@ -113,7 +113,7 @@ export default function NewProjectPage() {
               </div>
               <div>
                 <label className={label}>수주번호</label>
-                <input className={input} style={inputStyle} value={f.order_no} onChange={set("order_no")} placeholder="예: MNSI-2026-014" />
+                <input className={input} style={inputStyle} value={f.order_no} onChange={set("order_no")} placeholder="예: SYU-2026-014" />
               </div>
               <div>
                 <label className={label}>제품 유형</label>

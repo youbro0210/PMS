@@ -184,6 +184,50 @@ export interface BomSummary {
   amount_total: number;
 }
 
+export interface Resource {
+  id: string;
+  name: string;
+  trade: string | null;
+  monthly_rate: number;
+  capacity_pct: number;
+  is_active: boolean;
+  note: string | null;
+  created_at: string;
+}
+
+export interface ProjectAssignment {
+  id: string;
+  project_id: string;
+  resource_id: string;
+  work_package_id: string | null;
+  role: string | null;
+  allocation_pct: number;
+  start_date: string | null;
+  end_date: string | null;
+  planned_mm: number;
+  actual_mm: number | null;
+  note: string | null;
+  created_at: string;
+  updated_at: string;
+  resources?: { name: string; trade: string | null; monthly_rate: number } | null;
+}
+
+export interface ProjectLaborSummary {
+  project_id: string;
+  headcount: number;
+  planned_mm_total: number;
+  planned_labor_cost: number;
+}
+
+export interface ResourceUtilization {
+  resource_id: string;
+  name: string;
+  trade: string | null;
+  capacity_pct: number;
+  current_allocation_pct: number;
+  active_assignments: number;
+}
+
 /** 도면에서 추출된 BOM 1행(저장 전 검토용) */
 export interface ExtractedBomRow {
   item_no: number | null;
@@ -423,6 +467,8 @@ export interface Database {
       journal_vouchers: { Row: JournalVoucher; Insert: Insertable<JournalVoucher, "project_id" | "type">; Update: Partial<JournalVoucher> };
       journal_lines: { Row: JournalLine; Insert: Insertable<JournalLine, "voucher_id" | "account_code">; Update: Partial<JournalLine> };
       bom_items: { Row: BomItem; Insert: Insertable<BomItem, "project_id" | "description">; Update: Partial<BomItem> };
+      resources: { Row: Resource; Insert: Insertable<Resource, "name">; Update: Partial<Resource> };
+      project_assignments: { Row: ProjectAssignment; Insert: Insertable<ProjectAssignment, "project_id" | "resource_id">; Update: Partial<ProjectAssignment> };
       notifications: { Row: Notification; Insert: Insertable<Notification, "user_id" | "type" | "title">; Update: Partial<Notification> };
       activity_log: { Row: ActivityLog; Insert: Insertable<ActivityLog, "entity" | "action">; Update: Partial<ActivityLog> };
       ai_action_logs: { Row: AiActionLog; Insert: Insertable<AiActionLog, "input_text">; Update: Partial<AiActionLog> };
@@ -446,6 +492,8 @@ export interface Database {
       evm_summary: { Row: EvmSummary };
       account_summary: { Row: AccountSummary };
       bom_summary: { Row: BomSummary };
+      project_labor_summary: { Row: ProjectLaborSummary };
+      resource_utilization: { Row: ResourceUtilization };
     };
     Functions: {
       create_project: {
@@ -506,6 +554,10 @@ export interface Database {
       acct_backfill_project: {
         Args: { p_project_id: string };
         Returns: number;
+      };
+      admin_delete_project: {
+        Args: { p_project_id: string };
+        Returns: undefined;
       };
     };
   };

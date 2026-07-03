@@ -10,11 +10,12 @@ export function SiteHeader() {
     >
       <div className="flex items-center gap-8">
         <Link href="/" className="syu-logo text-2xl">
-          MnSi<span style={{ color: "var(--accent)" }}>·</span>PMS
+          SYU<span style={{ color: "var(--accent)" }}>·</span>PMS
         </Link>
         <nav className="hidden items-center gap-6 text-sm sm:flex" style={{ color: "var(--text)" }}>
           <Link href="/">수주</Link>
           <Link href="/portfolio">전사 현황</Link>
+          <Link href="/resources">인력</Link>
         </nav>
       </div>
       <UserMenu />
