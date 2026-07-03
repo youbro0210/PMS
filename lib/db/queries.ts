@@ -119,7 +119,7 @@ export async function getProjectAssignments(projectId: string) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("project_assignments")
-    .select("*, resources(name, trade, monthly_rate)")
+    .select("*, resources(employee_no, name, rank, trade, monthly_rate)")
     .eq("project_id", projectId)
     .order("created_at", { ascending: true });
   return data ?? [];

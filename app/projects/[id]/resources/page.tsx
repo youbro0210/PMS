@@ -19,12 +19,13 @@ export default async function ProjectResourcesPage({ params }: { params: Promise
       <SiteHeader />
       <ProjectNav projectId={id} />
       <div className="page">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="page-head">
           <div>
-            <h1 className="text-xl font-semibold" style={{ color: "var(--navy)" }}>인력 배정</h1>
-            <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>{project.name} · 인력 배정·계획 M/M·노무비. 인력 풀은 <Link href="/resources" style={{ color: "var(--accent)" }}>인력 관리</Link>에서 등록.</p>
+            <p className="eyebrow">{project.name}</p>
+            <h1 className="page-title">인력 배정</h1>
+            <p className="page-sub">인력 배정·계획 M/M·노무비. 인력 풀은 <Link href="/resources" className="link">인력 관리</Link>에서 등록.</p>
           </div>
-          <Link href={`/projects/${id}/board`} className="text-sm" style={{ color: "var(--accent)" }}>← 대시보드</Link>
+          <Link href={`/projects/${id}/board`} className="link text-[14px]">← 대시보드</Link>
         </div>
         <AssignmentsView
           projectId={id}
