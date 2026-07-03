@@ -139,7 +139,7 @@ export default function ImportPage() {
                     <tbody>
                       {rows.map((r, i) => (
                         <tr key={i} className="border-t" style={{ borderColor: "var(--border)" }}>
-                          <td className="px-2 py-1"><input className={`${cell} w-9`} style={style} value={r.item_no ?? ""} onChange={(e) => setRow(i, "item_no", Number(e.target.value) || 0)} /></td>
+                          <td className="px-2 py-1 text-center" style={{ color: "var(--muted)", width: 24 }}>{r.item_no ?? i + 1}</td>
                           <td className="px-2 py-1"><input className={cell} style={style} value={r.description} onChange={(e) => setRow(i, "description", e.target.value)} /></td>
                           <td className="px-2 py-1"><input className={`${cell} w-12`} style={style} value={r.qty} onChange={(e) => setRow(i, "qty", Number(e.target.value) || 0)} /></td>
                           <td className="px-2 py-1"><input className={`${cell} w-14`} style={style} value={r.size ?? ""} onChange={(e) => setRow(i, "size", e.target.value)} /></td>
@@ -172,7 +172,7 @@ export default function ImportPage() {
             <div className="mb-2 text-xs font-medium" style={{ color: "var(--muted)" }}>도면 미리보기</div>
             <div className="overflow-hidden rounded-xl border" style={{ background: "var(--surface)", borderColor: "var(--border)", height: "72vh" }}>
               {!previewUrl && <div className="flex h-full items-center justify-center text-sm" style={{ color: "var(--muted)" }}>파일을 선택하면 도면이 여기에 표시됩니다.</div>}
-              {previewUrl && isPdf && <iframe src={previewUrl} className="h-full w-full" title="도면" />}
+              {previewUrl && isPdf && <iframe src={`${previewUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH`} className="h-full w-full" title="도면" />}
               {previewUrl && !isPdf && <div className="flex h-full items-center justify-center overflow-auto p-2"><img src={previewUrl} alt="도면" className="max-h-full max-w-full object-contain" /></div>}
             </div>
           </div>
