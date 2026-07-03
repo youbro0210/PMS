@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { Resource, ProjectAssignment, ProjectLaborSummary } from "@/lib/db/types";
@@ -27,6 +27,16 @@ export function AssignmentsView({
     setRows((data as ProjectAssignment[]) ?? []);
     router.refresh();
   }
+
+  // 최초 로드 시 사번·직급 포함 데이터로 한 번 더 동기화(서버 초기 데이터가 구버전이어도 표시 보장)
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const { data } = await supabase.from("project_assignments").select("*, resources(employee_no, name, rank, trade, monthly_rate)").eq("project_id", projectId).order("created_at");
+      if (active && data) setRows(data as ProjectAssignment[]);
+    })();
+    return () => { active = false; };
+  }, [supabase, projectId]);
 
   async function add() {
     setErr(null);
