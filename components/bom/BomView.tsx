@@ -87,92 +87,90 @@ export function BomView({ projectId, initial }: { projectId: string; initial: Bo
   }, [rows]);
   const totalAmount = Object.values(summary).reduce((a, s) => a + s.amount, 0);
 
-  const cell = "rounded border bg-transparent px-2 py-1 text-xs";
-  const style = { borderColor: "var(--border)" };
+  const cellInput = "input-sm";
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {PT.map(([v, l]) => (
-          <div key={v} className="rounded-xl p-4" style={{ background: "var(--surface)" }}>
-            <div className="text-xs" style={{ color: "var(--muted)" }}>{l}</div>
-            <div className="mt-1 text-lg font-semibold">{summary[v]?.count ?? 0}건</div>
-            <div className="text-[11px]" style={{ color: "var(--muted)" }}>{won(summary[v]?.amount ?? 0)}</div>
+          <div key={v} className="kpi">
+            <div className="kpi-label">{l}</div>
+            <div className="kpi-value">{summary[v]?.count ?? 0}<span className="ml-0.5 text-[13px] font-medium" style={{ color: "var(--muted)" }}>건</span></div>
+            <div className="kpi-sub num">{won(summary[v]?.amount ?? 0)}</div>
           </div>
         ))}
       </section>
-      <div className="flex items-center justify-between">
-        <span className="text-sm" style={{ color: "var(--muted)" }}>BOM 총 {rows.length}행 · 합계 {won(totalAmount)}</span>
+
+      <div className="toolbar justify-between">
+        <span className="text-[13px]" style={{ color: "var(--muted)" }}>BOM 총 <b style={{ color: "var(--heading)" }}>{rows.length}</b>행 · 합계 <b className="num" style={{ color: "var(--heading)" }}>{won(totalAmount)}</b></span>
         <div className="flex items-center gap-2">
-          <button onClick={saveAll} disabled={savingAll || rows.length === 0} className="rounded-md px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50" style={{ background: "var(--navy)" }}>{savingAll ? "저장 중…" : "전체 저장"}</button>
-          <button onClick={add} className="rounded-md px-3 py-1.5 text-sm font-medium text-white" style={{ background: "var(--accent)" }}>+ 품목 추가</button>
+          <button onClick={saveAll} disabled={savingAll || rows.length === 0} className="btn btn-secondary btn-sm">{savingAll ? "저장 중…" : "전체 저장"}</button>
+          <button onClick={add} className="btn btn-primary btn-sm">+ 품목 추가</button>
         </div>
       </div>
 
-      <div className="rounded-lg border p-3" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+      <div className="toolbar">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          <span className="text-sm font-semibold" style={{ color: "var(--navy)" }}>발주(PO) 자동생성</span>
+          <span className="toolbar-label">발주(PO) 자동생성</span>
           <div className="flex items-center gap-1.5">
-            <span className="text-xs" style={{ color: "var(--muted)" }}>기준</span>
-            <select className="rounded border bg-transparent px-2 py-1 text-xs" style={style} value={basis} onChange={(e) => setBasis(e.target.value)}>
+            <span className="text-[12px]" style={{ color: "var(--muted)" }}>기준</span>
+            <select className="select input-sm w-auto" value={basis} onChange={(e) => setBasis(e.target.value)}>
               <option value="delivery">납기 역산</option>
               <option value="start">착수 정산</option>
             </select>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-xs" style={{ color: "var(--muted)" }}>{basis === "start" ? "착수일" : "납기일"}</span>
-            <input type="date" className="rounded border bg-transparent px-2 py-1 text-xs" style={style} value={anchor} onChange={(e) => setAnchor(e.target.value)} />
+            <span className="text-[12px]" style={{ color: "var(--muted)" }}>{basis === "start" ? "착수일" : "납기일"}</span>
+            <input type="date" className="input input-sm w-auto" value={anchor} onChange={(e) => setAnchor(e.target.value)} />
           </div>
-          <button onClick={generatePOs} disabled={genBusy} className="ml-auto rounded-md px-4 py-1.5 text-xs font-medium text-white disabled:opacity-50" style={{ background: "var(--accent)" }}>{genBusy ? "생성 중…" : "발주 생성"}</button>
         </div>
-        <p className="mt-2 text-[11px] leading-relaxed" style={{ color: "var(--muted)" }}>구매품·외주품을 리드타임(L/T)으로 발주일·입고예정(ETA)을 계산해 구매 탭에 생성합니다. 날짜를 비우면 프로젝트 납기/착수일을 사용하며, 롱리드(L/T≥8주)는 임계경로로 표시됩니다.</p>
+        <button onClick={generatePOs} disabled={genBusy} className="btn btn-primary btn-sm ml-auto">{genBusy ? "생성 중…" : "발주 생성"}</button>
+        <p className="w-full text-[11px] leading-relaxed" style={{ color: "var(--faint)" }}>구매품·외주품을 리드타임(L/T)으로 발주일·입고예정(ETA)을 계산해 구매 탭에 생성합니다. 날짜를 비우면 프로젝트 납기/착수일을 사용하며, 롱리드(L/T≥8주)는 임계경로로 표시됩니다.</p>
       </div>
-      {genMsg && <p className="text-xs" style={{ color: "#1d9e75" }}>{genMsg} <button onClick={() => router.push(`/projects/${projectId}/procurement`)} style={{ color: "var(--accent)" }}>구매 탭 보기 →</button></p>}
-      {err && <p className="text-sm text-red-500">{err}</p>}
+      {genMsg && <p className="rounded-[4px] px-3 py-2 text-[12px]" style={{ background: "var(--ok-soft)", color: "var(--ok)" }}>{genMsg} <button onClick={() => router.push(`/projects/${projectId}/procurement`)} className="font-semibold underline">구매 탭 보기 →</button></p>}
+      {err && <p className="rounded-[4px] px-3 py-2 text-[12px]" style={{ background: "var(--danger-soft)", color: "var(--danger)" }}>{err}</p>}
 
-      <div className="overflow-x-auto rounded-xl border" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-        <table className="w-full text-xs">
-          <thead><tr style={{ color: "var(--muted)" }}>
-            {["#", "품명", "수량", "규격", "제조사", "모델", "구매구분", "L/T주", "단가", "금액", ""].map((h, i) => <th key={i} className="px-2 py-2 text-left font-medium">{h}</th>)}
+      <div className="grid-wrap overflow-x-auto">
+        <table className="data-table">
+          <thead><tr>
+            {["#", "품명", "수량", "규격", "제조사", "모델", "구매구분", "L/T주", "단가", "금액", ""].map((h, i) => <th key={i}>{h}</th>)}
           </tr></thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.id} className="border-t" style={{ borderColor: "var(--border)" }}>
-                <td className="px-2 py-1">{r.item_no ?? "-"}</td>
-                <td className="px-2 py-1"><input className={`${cell} w-52`} style={style} value={r.description} onChange={(e) => patch(r, "description", e.target.value)} /></td>
-                <td className="px-2 py-1"><input className={`${cell} w-12`} style={style} value={r.qty} onChange={(e) => patch(r, "qty", Number(e.target.value) || 0)} /></td>
-                <td className="px-2 py-1"><input className={`${cell} w-16`} style={style} value={r.size ?? ""} onChange={(e) => patch(r, "size", e.target.value)} /></td>
-                <td className="px-2 py-1"><input className={`${cell} w-24`} style={style} value={r.manufacturer ?? ""} onChange={(e) => patch(r, "manufacturer", e.target.value)} /></td>
-                <td className="px-2 py-1"><input className={`${cell} w-24`} style={style} value={r.model ?? ""} onChange={(e) => patch(r, "model", e.target.value)} /></td>
-                <td className="px-2 py-1">
-                  <select className={cell} style={style} value={r.procure_type} onChange={(e) => patch(r, "procure_type", e.target.value)}>
+              <tr key={r.id}>
+                <td className="num" style={{ color: "var(--faint)" }}>{r.item_no ?? "-"}</td>
+                <td><input className={`${cellInput} w-52`} value={r.description} onChange={(e) => patch(r, "description", e.target.value)} /></td>
+                <td><input className={`${cellInput} w-14 text-right`} value={r.qty} onChange={(e) => patch(r, "qty", Number(e.target.value) || 0)} /></td>
+                <td><input className={`${cellInput} w-16`} value={r.size ?? ""} onChange={(e) => patch(r, "size", e.target.value)} /></td>
+                <td><input className={`${cellInput} w-24`} value={r.manufacturer ?? ""} onChange={(e) => patch(r, "manufacturer", e.target.value)} /></td>
+                <td><input className={`${cellInput} w-24`} value={r.model ?? ""} onChange={(e) => patch(r, "model", e.target.value)} /></td>
+                <td>
+                  <select className={`select ${cellInput} w-auto`} value={r.procure_type} onChange={(e) => patch(r, "procure_type", e.target.value)}>
                     {PT.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                   </select>
                 </td>
-                <td className="px-2 py-1"><input className={`${cell} w-12`} style={style} inputMode="numeric" value={r.lead_time_weeks ?? ""} onChange={(e) => patch(r, "lead_time_weeks", e.target.value.trim() === "" ? null : Number(e.target.value) || 0)} /></td>
-                <td className="px-2 py-1"><input className={`${cell} w-24`} style={style} inputMode="numeric" value={r.unit_price != null ? formatThousands(String(r.unit_price)) : ""} onChange={(e) => patch(r, "unit_price", e.target.value.trim() === "" ? null : Number(e.target.value.replace(/,/g, "")))} /></td>
-                <td className="px-2 py-1 whitespace-nowrap">{won(r.amount ?? (r.unit_price != null ? r.unit_price * r.qty : null))}</td>
-                <td className="px-2 py-1 whitespace-nowrap">
-                  <button onClick={() => save(r)} disabled={savingId === r.id} className="mr-2 rounded px-2 py-1 font-medium text-white disabled:opacity-50" style={{ background: "var(--accent)" }}>{savingId === r.id ? "…" : "저장"}</button>
-                  <button onClick={() => remove(r)} className="text-red-500">삭제</button>
+                <td><input className={`${cellInput} w-14 text-right`} inputMode="numeric" value={r.lead_time_weeks ?? ""} onChange={(e) => patch(r, "lead_time_weeks", e.target.value.trim() === "" ? null : Number(e.target.value) || 0)} /></td>
+                <td><input className={`${cellInput} w-24 text-right`} inputMode="numeric" value={r.unit_price != null ? formatThousands(String(r.unit_price)) : ""} onChange={(e) => patch(r, "unit_price", e.target.value.trim() === "" ? null : Number(e.target.value.replace(/,/g, "")))} /></td>
+                <td className="num whitespace-nowrap font-medium">{won(r.amount ?? (r.unit_price != null ? r.unit_price * r.qty : null))}</td>
+                <td className="whitespace-nowrap">
+                  <button onClick={() => save(r)} disabled={savingId === r.id} className="btn btn-secondary btn-sm mr-1">{savingId === r.id ? "…" : "저장"}</button>
+                  <button onClick={() => remove(r)} className="btn btn-danger btn-sm">삭제</button>
                 </td>
               </tr>
             ))}
-            {rows.length === 0 && <tr><td colSpan={11} className="px-3 py-6 text-center" style={{ color: "var(--muted)" }}>BOM이 없습니다. "도면으로 수주 생성"으로 도면을 올리거나 품목을 추가하세요.</td></tr>}
+            {rows.length === 0 && <tr><td colSpan={11} className="px-3 py-8 text-center" style={{ color: "var(--muted)" }}>BOM이 없습니다. “도면으로 수주 생성”으로 도면을 올리거나 품목을 추가하세요.</td></tr>}
           </tbody>
         </table>
       </div>
-      <p className="text-xs" style={{ color: "var(--muted)" }}>단가를 입력하면 금액(단가×수량)이 자동 계산되고, 구매구분별 집계·예산 배부·PO 생성의 기준이 됩니다.</p>
+      <p className="text-[12px]" style={{ color: "var(--faint)" }}>단가를 입력하면 금액(단가×수량)이 자동 계산되고, 구매구분별 집계·예산 배부·PO 생성의 기준이 됩니다.</p>
 
       {rows.length > 0 && (
-        <div className="sticky bottom-0 z-20 -mx-1 flex items-center justify-between gap-3 rounded-lg border px-4 py-3 shadow-lg"
-          style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-          <span className="text-sm" style={{ color: "var(--muted)" }}>총 {rows.length}행 · 합계 {won(totalAmount)}</span>
+        <div className="sticky bottom-0 z-20 flex items-center justify-between gap-3 rounded-[6px] border px-4 py-2.5"
+          style={{ background: "var(--surface)", borderColor: "var(--border-strong)", boxShadow: "var(--shadow-md)" }}>
+          <span className="text-[13px]" style={{ color: "var(--muted)" }}>총 <b style={{ color: "var(--heading)" }}>{rows.length}</b>행 · 합계 <b className="num" style={{ color: "var(--heading)" }}>{won(totalAmount)}</b></span>
           <div className="flex items-center gap-2">
-            <button onClick={add} className="rounded-md border px-3 py-2 text-sm font-medium" style={{ borderColor: "var(--border)" }}>+ 품목 추가</button>
-            <button onClick={saveAll} disabled={savingAll} className="rounded-md px-5 py-2 text-sm font-semibold text-white disabled:opacity-50" style={{ background: "var(--accent)" }}>
-              {savingAll ? "저장 중…" : "전체 저장"}
-            </button>
+            <button onClick={add} className="btn btn-secondary btn-sm">+ 품목 추가</button>
+            <button onClick={saveAll} disabled={savingAll} className="btn btn-primary">{savingAll ? "저장 중…" : "전체 저장"}</button>
           </div>
         </div>
       )}

@@ -1,21 +1,32 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { UserMenu } from "@/components/layout/UserMenu";
 
-/** SYU 스타일 상단 네비게이션 — 화이트 바탕, 네이비 로고, 사용자 메뉴 */
+const NAV = [
+  { href: "/", label: "수주" },
+  { href: "/portfolio", label: "전사 현황" },
+  { href: "/resources", label: "인력" },
+];
+
+/** 엔터프라이즈 상단바 — 네이비 바탕, 정갈한 워드마크, 밀도 높은 네비 */
 export function SiteHeader() {
+  const pathname = usePathname();
+  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+
   return (
-    <header
-      className="flex items-center justify-between border-b px-6 py-3"
-      style={{ background: "var(--surface)", borderColor: "var(--border)" }}
-    >
-      <div className="flex items-center gap-8">
-        <Link href="/" className="syu-logo text-2xl">
-          SYU<span style={{ color: "var(--accent)" }}>·</span>PMS
+    <header className="app-topbar">
+      <div className="flex items-center gap-7">
+        <Link href="/" className="syu-logo text-[17px]">
+          SYU<span className="mark" style={{ opacity: 0.55 }}>·</span>PMS
         </Link>
-        <nav className="hidden items-center gap-6 text-sm sm:flex" style={{ color: "var(--text)" }}>
-          <Link href="/">수주</Link>
-          <Link href="/portfolio">전사 현황</Link>
-          <Link href="/resources">인력</Link>
+        <nav className="hidden items-center gap-5 sm:flex">
+          {NAV.map((n) => (
+            <Link key={n.href} href={n.href} className="topnav-link" data-active={isActive(n.href)}>
+              {n.label}
+            </Link>
+          ))}
         </nav>
       </div>
       <UserMenu />

@@ -58,7 +58,7 @@ export function NotificationBell() {
 
   return (
     <div className="relative">
-      <button onClick={() => setOpen((o) => !o)} className="relative rounded-md border px-2.5 py-1 text-sm" style={{ borderColor: "var(--border)" }}>
+      <button onClick={() => setOpen((o) => !o)} className="relative rounded-[4px] border px-2.5 py-1 text-[12px] font-medium" style={{ borderColor: "rgba(255,255,255,.24)", color: "rgba(255,255,255,.9)" }}>
         알림
         {total > 0 && (
           <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-medium text-white" style={{ background: "var(--danger, #d93a3a)" }}>
@@ -68,7 +68,7 @@ export function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 z-20 mt-2 w-80 overflow-hidden rounded-xl border shadow-lg" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+        <div className="absolute right-0 z-20 mt-2 w-80 overflow-hidden rounded-[6px] border shadow-lg" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
           <div className="flex items-center justify-between border-b px-3 py-2 text-sm font-medium" style={{ borderColor: "var(--border)", color: "var(--navy)" }}>
             알림
             {unread > 0 && <button onClick={markAllRead} className="text-xs" style={{ color: "var(--accent)" }}>모두 읽음</button>}

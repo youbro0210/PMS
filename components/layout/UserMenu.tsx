@@ -37,14 +37,15 @@ export function UserMenu() {
       <NotificationBell />
       {isAdmin && (
         <>
-          <Link href="/settings/erp" className="text-xs" style={{ color: "var(--muted)" }}>설정</Link>
-          <Link href="/admin" className="rounded px-2 py-0.5 text-xs" style={{ background: "var(--accent-soft)", color: "var(--accent)" }}>
+          <Link href="/settings/erp" className="text-[12px] font-medium" style={{ color: "rgba(255,255,255,.72)" }}>설정</Link>
+          <Link href="/admin" className="rounded-[4px] px-2 py-0.5 text-[12px] font-semibold" style={{ background: "rgba(255,255,255,.14)", color: "#fff" }}>
             관리자
           </Link>
         </>
       )}
-      <span className="hidden max-w-[160px] truncate sm:inline" style={{ color: "var(--muted)" }}>{email}</span>
-      <button onClick={signOut} className="rounded-md border px-2.5 py-1 text-xs" style={{ borderColor: "var(--border)" }}>
+      <span className="hidden h-4 w-px sm:inline" style={{ background: "rgba(255,255,255,.18)" }} />
+      <span className="hidden max-w-[170px] truncate text-[12px] sm:inline" style={{ color: "rgba(255,255,255,.66)" }}>{email}</span>
+      <button onClick={signOut} className="rounded-[4px] border px-2.5 py-1 text-[12px] font-medium" style={{ borderColor: "rgba(255,255,255,.24)", color: "rgba(255,255,255,.9)" }}>
         로그아웃
       </button>
     </div>

@@ -37,19 +37,14 @@ export function ProjectNav({ projectId }: { projectId: string }) {
 
   const boardHref = `/projects/${projectId}/board`;
   return (
-    <nav
-      className="sticky top-0 z-30 flex flex-wrap items-center gap-x-4 gap-y-1 border-b px-4 py-2.5 text-sm sm:px-6"
-      style={{ background: "var(--surface)", borderColor: "var(--border)" }}
-    >
-      <Link href={boardHref} className="font-medium" style={{ color: pathname === boardHref ? "var(--navy)" : "var(--accent)" }}>
+    <nav className="tabstrip sticky top-0 z-30 overflow-x-auto">
+      <Link href={boardHref} className="tab" data-active={pathname === boardHref}>
         대시보드
       </Link>
-      <span style={{ color: "var(--border)" }}>|</span>
       {TABS.filter((t) => !t.admin || isAdmin).map((t) => {
         const href = `/projects/${projectId}/${t.seg}`;
-        const active = pathname === href;
         return (
-          <Link key={t.seg} href={href} style={{ color: active ? "var(--navy)" : "var(--accent)", fontWeight: active ? 600 : 400 }}>
+          <Link key={t.seg} href={href} className="tab" data-active={pathname === href}>
             {t.label}
           </Link>
         );

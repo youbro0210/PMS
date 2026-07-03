@@ -2,68 +2,78 @@ import Link from "next/link";
 import { getMyProjects } from "@/lib/db/queries";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 
+const STATUS: Record<string, { label: string; cls: string }> = {
+  planning: { label: "계획", cls: "badge-neutral" },
+  in_progress: { label: "진행", cls: "badge-info" },
+  active: { label: "진행", cls: "badge-info" },
+  on_hold: { label: "보류", cls: "badge-warn" },
+  completed: { label: "완료", cls: "badge-ok" },
+  cancelled: { label: "취소", cls: "badge-danger" },
+};
+
 export default async function HomePage() {
   const projects = await getMyProjects();
 
   return (
     <main>
       <SiteHeader />
-
-      {/* SYU 스타일 히어로 */}
-      <section className="syu-hero px-8 py-16">
-        <div className="mx-auto max-w-5xl">
-          <p className="text-sm opacity-80">수주 프로젝트 관리 시스템</p>
-          <h1 className="mt-2 text-3xl font-bold leading-snug">
-            문맥을 이해하는 지능형 수주·제작 관리
-          </h1>
-          <p className="mt-3 max-w-xl text-sm opacity-90">
-            단계 진척·대금·기자재 구매·FAT를 자연어로 관리합니다. 명령 한 줄이면 수주 데이터가 정리됩니다.
-          </p>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-5xl px-8 py-10">
-        <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-semibold" style={{ color: "var(--navy)" }}>수주 목록</h2>
+      <div className="page">
+        <div className="page-head">
+          <div>
+            <p className="eyebrow">수주 프로젝트</p>
+            <h1 className="page-title">수주 목록</h1>
+            <p className="page-sub">진행 중인 수주·제작 프로젝트를 관리합니다. 총 {projects.length}건</p>
+          </div>
           <div className="flex items-center gap-2">
-            <Link
-              href="/projects/import"
-              className="rounded-md border px-4 py-2 text-sm font-medium"
-              style={{ borderColor: "var(--accent)", color: "var(--accent)" }}
-            >
-              도면으로 수주 생성
-            </Link>
-            <Link
-              href="/projects/new"
-              className="rounded-md px-4 py-2 text-sm font-medium text-white"
-              style={{ background: "var(--accent)" }}
-            >
-              + 신규 수주 등록
-            </Link>
+            <Link href="/projects/import" className="btn btn-secondary">도면으로 수주 생성</Link>
+            <Link href="/projects/new" className="btn btn-primary">+ 신규 수주 등록</Link>
           </div>
         </div>
+
         {projects.length === 0 ? (
-          <p style={{ color: "var(--muted)" }}>등록된 현장이 없습니다.</p>
+          <div className="card flex flex-col items-center justify-center gap-1 py-16">
+            <p className="text-[14px] font-semibold" style={{ color: "var(--heading)" }}>등록된 수주가 없습니다</p>
+            <p className="text-[13px]" style={{ color: "var(--muted)" }}>‘신규 수주 등록’ 또는 ‘도면으로 수주 생성’으로 시작하세요.</p>
+          </div>
         ) : (
-          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {projects.map((p) => (
-              <li key={p.id}>
-                <Link
-                  href={`/projects/${p.id}/board`}
-                  className="block rounded-xl border p-5 transition hover:shadow-md"
-                  style={{ background: "var(--surface)", borderColor: "var(--border)" }}
-                >
-                  <div className="mb-2 text-2xl">{p.icon}</div>
-                  <div className="font-medium" style={{ color: "var(--navy)" }}>{p.name}</div>
-                  <div className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
-                    {p.client_name ?? "고객 미지정"}{p.end_user ? ` · ${p.end_user}` : ""} · {p.status}
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <div className="grid-wrap">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th style={{ width: 40 }}>#</th>
+                  <th>프로젝트</th>
+                  <th>발주처 / 최종수요처</th>
+                  <th style={{ width: 90 }}>상태</th>
+                  <th style={{ width: 40 }}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {projects.map((p, i) => {
+                  const s = STATUS[p.status as string] ?? { label: p.status, cls: "badge-neutral" };
+                  return (
+                    <tr key={p.id} className="group">
+                      <td className="num" style={{ color: "var(--faint)" }}>{i + 1}</td>
+                      <td>
+                        <Link href={`/projects/${p.id}/board`} className="flex items-center gap-2 font-semibold" style={{ color: "var(--heading)" }}>
+                          <span className="text-[15px] leading-none">{p.icon}</span>
+                          <span className="hover:underline">{p.name}</span>
+                        </Link>
+                      </td>
+                      <td style={{ color: "var(--muted)" }}>
+                        {p.client_name ?? "발주처 미지정"}{p.end_user ? ` · ${p.end_user}` : ""}
+                      </td>
+                      <td><span className={`badge ${s.cls}`}>{s.label}</span></td>
+                      <td className="text-right">
+                        <Link href={`/projects/${p.id}/board`} className="link text-[13px]">열기 →</Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
-      </section>
+      </div>
     </main>
   );
 }
