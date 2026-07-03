@@ -137,16 +137,15 @@ body{
   .kpi-value{ color:var(--heading); @apply mt-1 text-[26px] font-bold tracking-tight; font-variant-numeric:tabular-nums; }
   .kpi-sub{ color:var(--faint); @apply text-[12px]; }
 
-  /* ---------- 데이터 그리드 ---------- */
+  /* ---------- 데이터 그리드 (엑셀형 격자) ---------- */
   .grid-wrap{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); overflow:hidden; box-shadow:var(--shadow-sm); }
-  .data-table{ @apply w-full text-[14px]; border-collapse:separate; border-spacing:0; }
+  .data-table{ @apply w-full text-[15px]; border-collapse:collapse; }
   .data-table thead th{
     background:var(--surface-2); color:var(--muted);
-    @apply px-3.5 py-2.5 text-left text-[12px] font-bold uppercase tracking-wide;
-    border-bottom:1px solid var(--border); white-space:nowrap; position:sticky; top:0;
+    @apply px-3.5 py-2.5 text-left text-[13px] font-bold;
+    border:1px solid var(--border); white-space:nowrap; position:sticky; top:0;
   }
-  .data-table tbody td{ @apply px-3.5 py-2.5 align-middle; border-bottom:1px solid var(--border); }
-  .data-table tbody tr:last-child td{ border-bottom:none; }
+  .data-table tbody td{ @apply px-3.5 py-2.5 align-middle; border:1px solid var(--border); }
   .data-table tbody tr:hover td{ background:var(--surface-2); }
   .data-table .num{ text-align:right; }
 
@@ -182,4 +181,24 @@ body{
   /* 링크 표기 */
   .link{ color:var(--accent); @apply font-medium; }
   .link:hover{ color:var(--accent-hover); text-decoration:underline; }
+}
+
+/* ============================================================
+   전역 표: 모든 <table>을 엑셀형 격자(세로·가로 칸선)로 통일
+   차트는 SVG라 영향 없음. 개별 테이블 마크업을 수정하지 않아도 적용됨.
+   ============================================================ */
+table{ border-collapse:collapse; }
+table th, table td{
+  border:1px solid var(--border);
+}
+/* 헤더 행 배경/굵기 */
+table thead th{
+  background:var(--surface-2);
+  font-weight:700;
+}
+/* 일반 표(.data-table가 아닌) 셀 가독성: 최소 글자/여백 */
+table:not(.data-table) th,
+table:not(.data-table) td{
+  font-size:14px;
+  padding:8px 12px;
 }

@@ -84,12 +84,20 @@ export default function ErpSettingsPage() {
   return (
     <main>
       <SiteHeader />
-      <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-        <div className="mb-2 flex items-center justify-between">
-          <h1 className="text-xl font-semibold" style={{ color: "var(--navy)" }}>설정 · ERP 연동</h1>
-          <Link href="/" className="text-sm" style={{ color: "var(--accent)" }}>← 홈</Link>
+      <div className="page" style={{ maxWidth: 1080 }}>
+        <div className="page-head">
+          <div>
+            <p className="eyebrow">설정</p>
+            <h1 className="page-title">ERP 연동</h1>
+            <p className="page-sub">모듈마다 연동 방식(미사용·테스트·DB·API)·방향·엔드포인트를 따로 설정합니다.</p>
+          </div>
+          <Link href="/" className="link text-[14px]">← 홈</Link>
         </div>
-        <p className="mb-6 text-xs" style={{ color: "var(--muted)" }}>모듈마다 연동 방식(미사용·테스트·DB·API)·방향·엔드포인트를 따로 설정합니다. 규격은 옴니이솔과 협의 후 확정(docs/ERP_INTEGRATION.md).</p>
+
+        <div className="mb-4 flex items-center gap-1">
+          <Link href="/settings/erp" className="tab" data-active={true}>ERP 연동</Link>
+          <Link href="/settings/projects" className="tab" data-active={false}>수주 관리</Link>
+        </div>
 
         {allowed === false && <p className="text-sm" style={{ color: "var(--muted)" }}>시스템 관리자만 접근할 수 있습니다.</p>}
 
