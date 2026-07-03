@@ -18,7 +18,7 @@ export default async function EvmPage({ params }: { params: Promise<{ id: string
     <main>
       <SiteHeader />
       <ProjectNav projectId={id} />
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
+      <div className="page">
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-semibold" style={{ color: "var(--navy)" }}>EVM 성과분석</h1>

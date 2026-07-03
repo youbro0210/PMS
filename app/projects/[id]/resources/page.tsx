@@ -18,7 +18,7 @@ export default async function ProjectResourcesPage({ params }: { params: Promise
     <main>
       <SiteHeader />
       <ProjectNav projectId={id} />
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
+      <div className="page">
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-semibold" style={{ color: "var(--navy)" }}>인력 배정</h1>

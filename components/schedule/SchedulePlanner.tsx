@@ -120,69 +120,73 @@ export function SchedulePlanner({ projectId, initial }: { projectId: string; ini
   }
 
   const totalBudget = works.reduce((a, w) => a + (w.planned_amount ?? 0), 0);
-  const input = "w-full rounded border bg-transparent px-2 py-1 text-xs";
-  const style = { borderColor: "var(--border)" };
 
   return (
     <div className="space-y-6">
       <Gantt works={works} />
 
-      <section>
-        <div className="mb-2 flex items-center justify-between">
-          <h2 className="text-sm font-medium">단계 계획 입력 (일정·예산·진척)</h2>
-          <span className="text-xs" style={{ color: "var(--muted)" }}>총 계획예산 {won(totalBudget)}</span>
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-[16px] font-bold" style={{ color: "var(--heading)" }}>단계 계획 입력 <span className="font-normal" style={{ color: "var(--muted)" }}>(일정·예산·진척)</span></h2>
+          <span className="text-[14px]" style={{ color: "var(--muted)" }}>총 계획예산 <b className="num" style={{ color: "var(--heading)" }}>{won(totalBudget)}</b></span>
         </div>
-        {err && <p className="mb-2 text-sm text-red-500">{err}</p>}
+        {err && <p className="rounded-[4px] px-3 py-2 text-[13px]" style={{ background: "var(--danger-soft)", color: "var(--danger)" }}>{err}</p>}
 
-        <div className="mb-3 flex flex-wrap items-end gap-2 rounded-lg border p-3" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-          <span className="text-xs font-medium">기본 일정 자동배분</span>
-          <label className="text-xs">착수<input type="date" className={`${input} ml-1 w-auto`} style={style} value={redist.start} onChange={(e) => setRedist({ ...redist, start: e.target.value })} /></label>
-          <label className="text-xs">납기<input type="date" className={`${input} ml-1 w-auto`} style={style} value={redist.end} onChange={(e) => setRedist({ ...redist, end: e.target.value })} /></label>
-          <button onClick={redistribute} disabled={busy} className="rounded px-3 py-1 text-xs font-medium text-white disabled:opacity-50" style={{ background: "var(--accent)" }}>가중치대로 배분</button>
-          <span className="text-[11px]" style={{ color: "var(--muted)" }}>모든 단계의 계획 시작·종료를 착수~납기 구간에 비중대로 채웁니다.</span>
+        <div className="toolbar">
+          <span className="toolbar-label">기본 일정 자동배분</span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[13px]" style={{ color: "var(--muted)" }}>착수</span>
+            <input type="date" className="input input-sm w-auto" value={redist.start} onChange={(e) => setRedist({ ...redist, start: e.target.value })} />
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[13px]" style={{ color: "var(--muted)" }}>납기</span>
+            <input type="date" className="input input-sm w-auto" value={redist.end} onChange={(e) => setRedist({ ...redist, end: e.target.value })} />
+          </div>
+          <button onClick={redistribute} disabled={busy} className="btn btn-primary btn-sm">가중치대로 배분</button>
+          <span className="w-full text-[12px]" style={{ color: "var(--faint)" }}>모든 단계의 계획 시작·종료를 착수~납기 구간에 비중대로 채웁니다.</span>
         </div>
 
-        <div className="overflow-x-auto rounded-xl border" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-          <table className="w-full text-xs">
-            <thead><tr style={{ color: "var(--muted)" }}>
+        <div className="grid-wrap overflow-x-auto">
+          <table className="data-table">
+            <thead><tr>
               {["단계", "계획 시작", "계획 종료", "계획 예산(원)", "계획 진척%", "실적 진척%", ""].map((h, i) => (
-                <th key={i} className="px-2 py-2 text-left font-medium">{h}</th>
+                <th key={i}>{h}</th>
               ))}
             </tr></thead>
             <tbody>
               {works.map((w) => {
                 const d = drafts[w.id];
                 return (
-                  <tr key={w.id} className="border-t" style={{ borderColor: "var(--border)" }}>
-                    <td className="whitespace-nowrap px-2 py-2">
-                      {w.code && <span style={{ color: "var(--muted)" }} className="mr-1">{w.code}</span>}{w.name}
+                  <tr key={w.id}>
+                    <td className="whitespace-nowrap font-medium">
+                      {w.code && <span style={{ color: "var(--faint)" }} className="mr-1.5">{w.code}</span>}{w.name}
                     </td>
-                    <td className="px-2 py-2"><input type="date" className={input} style={style} value={d.planned_start} onChange={(e) => setDraft(w.id, "planned_start", e.target.value)} /></td>
-                    <td className="px-2 py-2"><input type="date" className={input} style={style} value={d.planned_end} onChange={(e) => setDraft(w.id, "planned_end", e.target.value)} /></td>
-                    <td className="px-2 py-2"><input className={`${input} w-28`} style={style} inputMode="numeric" value={d.planned_amount} onChange={(e) => setDraft(w.id, "planned_amount", formatThousands(e.target.value))} /></td>
-                    <td className="px-2 py-2"><input className={`${input} w-16`} style={style} inputMode="numeric" value={d.planned_progress} onChange={(e) => setDraft(w.id, "planned_progress", e.target.value)} /></td>
-                    <td className="px-2 py-2"><input className={`${input} w-16`} style={style} inputMode="numeric" value={d.actual_progress} onChange={(e) => setDraft(w.id, "actual_progress", e.target.value)} /></td>
-                    <td className="whitespace-nowrap px-2 py-2">
-                      <button onClick={() => save(w)} disabled={savingId === w.id} className="mr-2 rounded px-2 py-1 font-medium text-white disabled:opacity-50" style={{ background: okId === w.id ? "#1d9e75" : "var(--accent)" }}>
+                    <td><input type="date" className="input input-sm" value={d.planned_start} onChange={(e) => setDraft(w.id, "planned_start", e.target.value)} /></td>
+                    <td><input type="date" className="input input-sm" value={d.planned_end} onChange={(e) => setDraft(w.id, "planned_end", e.target.value)} /></td>
+                    <td><input className="input input-sm w-32 text-right" inputMode="numeric" value={d.planned_amount} onChange={(e) => setDraft(w.id, "planned_amount", formatThousands(e.target.value))} /></td>
+                    <td><input className="input input-sm w-20 text-right" inputMode="numeric" value={d.planned_progress} onChange={(e) => setDraft(w.id, "planned_progress", e.target.value)} /></td>
+                    <td><input className="input input-sm w-20 text-right" inputMode="numeric" value={d.actual_progress} onChange={(e) => setDraft(w.id, "actual_progress", e.target.value)} /></td>
+                    <td className="whitespace-nowrap">
+                      <button onClick={() => save(w)} disabled={savingId === w.id} className={`btn btn-sm mr-1 ${okId === w.id ? "btn-primary" : "btn-secondary"}`} style={okId === w.id ? { background: "var(--ok)", borderColor: "var(--ok)" } : undefined}>
                         {savingId === w.id ? "저장…" : okId === w.id ? "저장됨" : "저장"}
                       </button>
-                      <button onClick={() => removePhase(w)} className="text-red-500">삭제</button>
+                      <button onClick={() => removePhase(w)} className="btn btn-danger btn-sm">삭제</button>
                     </td>
                   </tr>
                 );
               })}
-              {works.length === 0 && <tr><td colSpan={7} className="px-3 py-6 text-center" style={{ color: "var(--muted)" }}>등록된 단계가 없습니다. 아래에서 단계를 추가하세요.</td></tr>}
-              <tr className="border-t" style={{ borderColor: "var(--border)" }}>
-                <td className="px-2 py-2"><input className={input} style={style} placeholder="새 단계명" value={newPhase.name} onChange={(e) => setNewPhase({ ...newPhase, name: e.target.value })} /></td>
-                <td className="px-2 py-2" colSpan={3}><span className="text-[11px]" style={{ color: "var(--muted)" }}>추가 후 일정·예산을 입력하세요</span></td>
-                <td className="px-2 py-2"><input className={`${input} w-16`} style={style} inputMode="numeric" value={newPhase.weight} onChange={(e) => setNewPhase({ ...newPhase, weight: e.target.value })} placeholder="비중%" /></td>
-                <td className="px-2 py-2"></td>
-                <td className="px-2 py-2"><button onClick={addPhase} disabled={busy} className="rounded border px-2 py-1 font-medium disabled:opacity-50" style={{ borderColor: "var(--accent)", color: "var(--accent)" }}>+ 단계 추가</button></td>
+              {works.length === 0 && <tr><td colSpan={7} className="px-3 py-8 text-center" style={{ color: "var(--muted)" }}>등록된 단계가 없습니다. 아래에서 단계를 추가하세요.</td></tr>}
+              <tr style={{ background: "var(--surface-2)" }}>
+                <td><input className="input input-sm" placeholder="새 단계명" value={newPhase.name} onChange={(e) => setNewPhase({ ...newPhase, name: e.target.value })} /></td>
+                <td colSpan={3}><span className="text-[12px]" style={{ color: "var(--faint)" }}>추가 후 일정·예산을 입력하세요</span></td>
+                <td><input className="input input-sm w-20 text-right" inputMode="numeric" value={newPhase.weight} onChange={(e) => setNewPhase({ ...newPhase, weight: e.target.value })} placeholder="비중%" /></td>
+                <td></td>
+                <td><button onClick={addPhase} disabled={busy} className="btn btn-secondary btn-sm">+ 단계 추가</button></td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p className="mt-2 text-xs" style={{ color: "var(--muted)" }}>
+        <p className="text-[13px]" style={{ color: "var(--faint)" }}>
           계획 예산 합계가 EVM의 BAC(총예산)로 쓰이고, 계획·실적 진척이 S-curve와 게이지에 반영됩니다.
         </p>
       </section>

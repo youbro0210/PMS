@@ -75,7 +75,7 @@ export default function BillingsPage() {
     <main>
       <SiteHeader />
       <ProjectNav projectId={id} />
-      <div className="mx-auto max-w-4xl px-6 py-10">
+      <div className="page">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-xl font-semibold" style={{ color: "var(--navy)" }}>대금(기성) 관리</h1>
           <Link href={`/projects/${id}/board`} className="text-sm" style={{ color: "var(--accent)" }}>← 대시보드</Link>

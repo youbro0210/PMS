@@ -44,7 +44,7 @@ export default function PortfolioPage() {
   return (
     <main>
       <SiteHeader />
-      <div className="mx-auto max-w-5xl px-6 py-10">
+      <div className="page">
         <h1 className="mb-6 text-xl font-semibold" style={{ color: "var(--navy)" }}>전사 수주 현황</h1>
 
         <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">

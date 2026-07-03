@@ -60,7 +60,7 @@ export default function ResourcesPage() {
   return (
     <main>
       <SiteHeader />
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
+      <div className="page">
         <h1 className="text-xl font-semibold" style={{ color: "var(--navy)" }}>인력 관리 (전사 인력 풀)</h1>
         <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>직종·월단가·가동률을 등록하고, 프로젝트별 인력 화면에서 배정합니다. 현재 배정률 합이 가동률을 넘으면 과배정으로 표시됩니다.</p>
         {overCount > 0 && <p className="mt-2 text-sm" style={{ color: "#ef4444" }}>⚠ 과배정 인력 {overCount}명</p>}

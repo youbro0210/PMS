@@ -89,7 +89,7 @@ export default function RisksPage() {
     <main>
       <SiteHeader />
       <ProjectNav projectId={id} />
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
+      <div className="page">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-xl font-semibold" style={{ color: "var(--navy)" }}>리스크 관리</h1>
           <Link href={`/projects/${id}/board`} className="text-sm" style={{ color: "var(--accent)" }}>← 대시보드</Link>

@@ -12,7 +12,7 @@ export default async function SchedulePage({ params }: { params: Promise<{ id: s
     <main>
       <SiteHeader />
       <ProjectNav projectId={id} />
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+      <div className="page">
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-semibold" style={{ color: "var(--navy)" }}>일정 간트차트 · 단계 계획</h1>
