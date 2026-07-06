@@ -157,7 +157,7 @@ function Info({ label, value, strong, valueColor }: { label: string; value: stri
   return (
     <div>
       <div className="text-[12px]" style={{ color: "var(--muted)" }}>{label}</div>
-      <div className={`mt-0.5 ${strong ? "text-[17px] font-bold" : "text-[15px] font-semibold"}`} style={{ color: valueColor ?? "var(--heading)", fontVariantNumeric: "tabular-nums" }}>{value}</div>
+      <div className={`mt-0.5 leading-tight ${strong ? "text-[15px] font-bold sm:text-[17px]" : "text-[14px] font-semibold sm:text-[15px]"}`} style={{ color: valueColor ?? "var(--heading)", fontVariantNumeric: "tabular-nums", overflowWrap: "anywhere" }}>{value}</div>
     </div>
   );
 }
@@ -191,10 +191,10 @@ function ScheduleBar({ start, end }: { start: string; end: string }) {
 
 function Metric({ label, value, sub, subColor }: { label: string; value: string; sub?: string; subColor?: string }) {
   return (
-    <div className="rounded-xl p-4" style={{ background: "var(--surface)" }}>
-      <div className="text-xs" style={{ color: "var(--muted)" }}>{label}</div>
-      <div className="mt-1 text-2xl font-semibold">{value}</div>
-      {sub && <div className="mt-1 text-xs" style={{ color: subColor ?? "var(--muted)" }}>{sub}</div>}
+    <div className="min-w-0 rounded-xl p-4" style={{ background: "var(--surface)" }}>
+      <div className="text-[12px] sm:text-xs" style={{ color: "var(--muted)" }}>{label}</div>
+      <div className="mt-1 text-[18px] font-semibold leading-tight sm:text-2xl" style={{ overflowWrap: "anywhere", fontVariantNumeric: "tabular-nums" }}>{value}</div>
+      {sub && <div className="mt-1 text-[11px] sm:text-xs" style={{ color: subColor ?? "var(--muted)", overflowWrap: "anywhere" }}>{sub}</div>}
     </div>
   );
 }

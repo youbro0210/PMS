@@ -78,13 +78,13 @@ export function EvmView({
       <section className="grid grid-cols-2 gap-3">
         <div className="rounded-xl border p-4" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
           <div className="text-xs" style={{ color: "var(--muted)" }}>SV 일정차이 (EV−PV)</div>
-          <div className="mt-1 text-lg font-semibold" style={{ color: (s?.sv ?? 0) >= 0 ? "#1d9e75" : "#ef4444" }}>
+          <div className="mt-1 text-[15px] font-semibold leading-tight sm:text-lg" style={{ color: (s?.sv ?? 0) >= 0 ? "#1d9e75" : "#ef4444", overflowWrap: "anywhere" }}>
             {(s?.sv ?? 0) >= 0 ? "+" : ""}{won(s?.sv)} {(s?.sv ?? 0) >= 0 ? "선행" : "지연"}
           </div>
         </div>
         <div className="rounded-xl border p-4" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
           <div className="text-xs" style={{ color: "var(--muted)" }}>CV 원가차이 (EV−AC)</div>
-          <div className="mt-1 text-lg font-semibold" style={{ color: (s?.cv ?? 0) >= 0 ? "#1d9e75" : "#ef4444" }}>
+          <div className="mt-1 text-[15px] font-semibold leading-tight sm:text-lg" style={{ color: (s?.cv ?? 0) >= 0 ? "#1d9e75" : "#ef4444", overflowWrap: "anywhere" }}>
             {(s?.cv ?? 0) >= 0 ? "+" : ""}{won(s?.cv)} {(s?.cv ?? 0) >= 0 ? "절감" : "초과"}
           </div>
         </div>
@@ -104,10 +104,10 @@ export function EvmView({
 
 function Card({ label, value, sub, color }: { label: string; value: string; sub?: string; color?: string }) {
   return (
-    <div className="rounded-xl p-4" style={{ background: "var(--surface)" }}>
-      <div className="text-xs" style={{ color: "var(--muted)" }}>{label}</div>
-      <div className="mt-1 text-xl font-semibold" style={{ color }}>{value}</div>
-      {sub && <div className="mt-1 text-[11px]" style={{ color: "var(--muted)" }}>{sub}</div>}
+    <div className="min-w-0 rounded-xl p-4" style={{ background: "var(--surface)" }}>
+      <div className="text-[12px] sm:text-xs" style={{ color: "var(--muted)" }}>{label}</div>
+      <div className="mt-1 text-[16px] font-semibold leading-tight sm:text-xl" style={{ color, overflowWrap: "anywhere", fontVariantNumeric: "tabular-nums" }}>{value}</div>
+      {sub && <div className="mt-1 text-[11px]" style={{ color: "var(--muted)", overflowWrap: "anywhere" }}>{sub}</div>}
     </div>
   );
 }

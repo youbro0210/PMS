@@ -132,10 +132,10 @@ body{
   .toolbar-label{ color:var(--heading); @apply text-[15px] font-bold; }
 
   /* ---------- KPI ---------- */
-  .kpi{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); @apply p-5; box-shadow:var(--shadow-sm); }
-  .kpi-label{ color:var(--muted); @apply text-[13px] font-medium; }
-  .kpi-value{ color:var(--heading); @apply mt-1 text-[26px] font-bold tracking-tight; font-variant-numeric:tabular-nums; }
-  .kpi-sub{ color:var(--faint); @apply text-[12px]; }
+  .kpi{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); @apply min-w-0 p-4 sm:p-5; box-shadow:var(--shadow-sm); }
+  .kpi-label{ color:var(--muted); @apply text-[12px] font-medium sm:text-[13px]; }
+  .kpi-value{ color:var(--heading); @apply mt-1 text-[19px] font-bold tracking-tight sm:text-[23px] lg:text-[26px]; line-height:1.15; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+  .kpi-sub{ color:var(--faint); @apply text-[11px] sm:text-[12px]; overflow-wrap:anywhere; }
 
   /* ---------- 데이터 그리드 (엑셀형 격자) ---------- */
   .grid-wrap{ background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); overflow:hidden; box-shadow:var(--shadow-sm); }
