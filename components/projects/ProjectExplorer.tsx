@@ -65,9 +65,8 @@ export function ProjectExplorer({ projects }: { projects: ProjectItem[] }) {
 
   return (
     <div className="space-y-3">
-      {/* 조회 조건 — 조회 버튼 항상 왼쪽 */}
+      {/* 조회 조건 — 조회 버튼은 검색/전체 건수 바로 왼쪽 */}
       <form onSubmit={search} className="toolbar">
-        <button type="submit" className="btn btn-primary btn-sm">조회</button>
         <input
           className="input input-sm w-full sm:w-64"
           placeholder="프로젝트명·발주처 검색"
@@ -78,9 +77,12 @@ export function ProjectExplorer({ projects }: { projects: ProjectItem[] }) {
           {STATUS_OPTIONS.map((o) => <option key={o.v} value={o.v}>{o.l}</option>)}
         </select>
         <button type="button" onClick={reset} className="btn btn-ghost btn-sm">초기화</button>
-        <span className="ml-auto text-[13px]" style={{ color: "var(--muted)" }}>
-          검색 <b style={{ color: "var(--heading)" }}>{filtered.length}</b>건 / 전체 {projects.length}건
-        </span>
+        <div className="ml-auto flex items-center gap-3">
+          <button type="submit" className="btn btn-primary btn-sm">조회</button>
+          <span className="text-[13px]" style={{ color: "var(--muted)" }}>
+            검색 <b style={{ color: "var(--heading)" }}>{filtered.length}</b>건 / 전체 {projects.length}건
+          </span>
+        </div>
       </form>
 
       {filtered.length === 0 ? (
