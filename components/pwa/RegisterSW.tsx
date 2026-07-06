@@ -6,7 +6,8 @@ import { useEffect } from "react";
 export function RegisterSW() {
   useEffect(() => {
     if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
-    const onLoad = () => navigator.serviceWorker.register("/sw.js").catch(() => {});
+    // updateViaCache:'none' → sw.js 자체를 HTTP 캐시하지 않아 새 버전이 바로 반영됨
+    const onLoad = () => navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).catch(() => {});
     if (document.readyState === "complete") onLoad();
     else window.addEventListener("load", onLoad, { once: true });
   }, []);
