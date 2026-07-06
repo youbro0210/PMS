@@ -77,33 +77,36 @@ export function ChatPanel({ projectId, onChange }: { projectId: string; onChange
   }
 
   return (
-    <aside className="flex h-96 w-full flex-shrink-0 flex-col border-t lg:h-auto lg:w-96 lg:border-l lg:border-t-0" style={{ borderColor: "var(--border)" }}>
-      <div className="flex items-center justify-between border-b p-3 text-sm font-medium" style={{ borderColor: "var(--border)" }}>
-        <span>AI 어시스턴트</span>
+    <aside className="flex h-[70vh] w-full flex-shrink-0 flex-col border-t lg:h-auto lg:w-96 lg:border-l lg:border-t-0" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+      <div className="flex items-center justify-between border-b px-4 py-3" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
+        <span className="text-[15px] font-bold" style={{ color: "var(--heading)" }}>AI 어시스턴트</span>
         {messages.length > 0 && (
           <button
             onClick={() => setMessages([])}
-            className="rounded-md border px-2 py-0.5 text-xs font-normal"
-            style={{ borderColor: "var(--border)", color: "var(--muted)" }}
+            className="rounded-[4px] border px-2.5 py-1 text-[13px] font-medium"
+            style={{ borderColor: "var(--border-strong)", color: "var(--muted)" }}
           >
             초기화
           </button>
         )}
       </div>
 
-      <div className="flex-1 space-y-3 overflow-y-auto p-3">
+      <div className="flex-1 space-y-3 overflow-y-auto p-4">
         {messages.length === 0 && (
-          <p className="text-xs" style={{ color: "var(--muted)" }}>
-            예: &quot;상세설계 진척 70%로 갱신해줘&quot; · &quot;NEA 압축기 본체 롱리드로 발주 등록&quot;
-          </p>
+          <div className="rounded-[6px] border px-3 py-3 text-[14px] leading-relaxed" style={{ borderColor: "var(--border)", background: "var(--surface-2)", color: "var(--muted)" }}>
+            <p className="mb-1 font-semibold" style={{ color: "var(--heading)" }}>이렇게 명령해 보세요</p>
+            <p>· 상세설계 진척 70%로 갱신해줘</p>
+            <p>· NEA 압축기 본체 롱리드로 발주 등록</p>
+          </div>
         )}
         {messages.map((m, i) => (
           <div key={i} className={m.role === "user" ? "text-right" : "text-left"}>
             <div
-              className="inline-block max-w-[88%] whitespace-pre-wrap rounded-lg px-3 py-2 text-left text-sm leading-relaxed"
+              className="inline-block max-w-[90%] whitespace-pre-wrap rounded-[8px] px-3.5 py-2.5 text-left text-[15px] leading-relaxed"
               style={{
                 background: m.role === "user" ? "var(--accent)" : "var(--surface-2)",
                 color: m.role === "user" ? "#fff" : "var(--text)",
+                border: m.role === "assistant" ? "1px solid var(--border)" : "none",
               }}
             >
               {m.role === "assistant"
@@ -115,7 +118,8 @@ export function ChatPanel({ projectId, onChange }: { projectId: string; onChange
               <div className="mt-2">
                 <button
                   onClick={() => send(m.originalText!, true)}
-                  className="rounded bg-red-600 px-3 py-1 text-xs text-white"
+                  className="rounded-[6px] px-4 py-2 text-[14px] font-semibold text-white"
+                  style={{ background: "var(--danger)" }}
                 >
                   삭제 확인
                 </button>
@@ -123,13 +127,13 @@ export function ChatPanel({ projectId, onChange }: { projectId: string; onChange
             )}
 
             {m.candidates && m.candidates.length > 0 && !m.needsConfirmation && (
-              <div className="mt-2 space-y-1">
+              <div className="mt-2 space-y-1.5">
                 {m.candidates.map((c) => (
                   <button
                     key={c.id}
                     onClick={() => send(`"${c.title}"`)}
-                    className="block w-full rounded border px-2 py-1 text-left text-xs"
-                    style={{ borderColor: "var(--border)" }}
+                    className="block w-full rounded-[6px] border px-3 py-2 text-left text-[14px]"
+                    style={{ borderColor: "var(--border-strong)", background: "var(--surface)" }}
                   >
                     {c.title}
                   </button>
@@ -146,7 +150,7 @@ export function ChatPanel({ projectId, onChange }: { projectId: string; onChange
           send(input);
         }}
         className="flex items-center gap-2 border-t p-3"
-        style={{ borderColor: "var(--border)" }}
+        style={{ borderColor: "var(--border)", background: "var(--surface)" }}
       >
         <input
           value={input}
@@ -154,14 +158,14 @@ export function ChatPanel({ projectId, onChange }: { projectId: string; onChange
           disabled={busy}
           enterKeyHint="send"
           placeholder={busy ? "처리 중…" : "자연어로 명령하세요"}
-          className="min-w-0 flex-1 rounded-md border bg-transparent px-3 py-2 text-sm"
-          style={{ borderColor: "var(--border)" }}
+          className="min-w-0 flex-1 rounded-[6px] border bg-transparent px-3 py-2.5 text-[16px]"
+          style={{ borderColor: "var(--border-strong)" }}
         />
         <button
           type="submit"
           disabled={busy || !input.trim()}
           aria-label="전송"
-          className="flex-shrink-0 rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+          className="flex-shrink-0 rounded-[6px] px-5 py-2.5 text-[15px] font-semibold text-white disabled:opacity-50"
           style={{ background: "var(--accent)" }}
         >
           전송

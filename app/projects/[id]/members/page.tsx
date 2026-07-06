@@ -26,22 +26,26 @@ export default function MembersPage() {
   const [deleting, setDeleting] = useState(false);
   const [rows, setRows] = useState<Row[]>([]);
   const [myRole, setMyRole] = useState<MemberRole | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<MemberRole>("developer");
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
-  const canManage = myRole === "owner" || myRole === "manager";
+  // 시스템 관리자는 어떤 프로젝트든 권한을 배부할 수 있다
+  const canManage = isAdmin || myRole === "owner" || myRole === "manager";
 
   const load = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    const [{ data }, { data: proj }] = await Promise.all([
+    const [{ data }, { data: proj }, { data: me }] = await Promise.all([
       supabase.from("project_members").select("id, role, user_id, profiles(full_name, email)").eq("project_id", id),
       supabase.from("projects").select("name").eq("id", id).maybeSingle(),
+      user ? supabase.from("profiles").select("is_admin").eq("id", user.id).maybeSingle() : Promise.resolve({ data: null }),
     ]);
     const list = (data as unknown as Row[]) ?? [];
     setRows(list);
     setMyRole(list.find((r) => r.user_id === user?.id)?.role ?? null);
+    setIsAdmin(Boolean((me as { is_admin?: boolean } | null)?.is_admin));
     setProjectName(proj?.name ?? "");
   }, [supabase, id]);
 
@@ -128,7 +132,7 @@ export default function MembersPage() {
           {rows.length === 0 && <p className="px-4 py-6 text-sm" style={{ color: "var(--muted)" }}>멤버가 없습니다.</p>}
         </div>
 
-        {!canManage && <p className="mt-4 text-xs" style={{ color: "var(--muted)" }}>멤버 추가·역할 변경은 소유자/관리자(PM)만 가능합니다.</p>}
+        {!canManage && <p className="mt-4 text-xs" style={{ color: "var(--muted)" }}>멤버 추가·역할 변경은 소유자/관리자(PM) 또는 시스템 관리자만 가능합니다.</p>}
 
         {(myRole === "owner") && (
           <div className="mt-10 rounded-xl border p-4" style={{ borderColor: "#ef4444", background: "var(--surface)" }}>
