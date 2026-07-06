@@ -5,10 +5,14 @@ import { createClient } from "@/lib/supabase/client";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { ROLE_LABELS, type MemberRole } from "@/lib/db/types";
 
-interface UserRow { id: string; email: string; full_name: string | null; is_admin: boolean; created_at: string }
+interface UserRow { id: string; email: string; full_name: string | null; is_admin: boolean; created_at: string; last_sign_in_at: string | null }
 interface ProjectRow { id: string; name: string }
 
 const ASSIGN_ROLES: MemberRole[] = ["manager", "developer", "designer", "tester", "viewer"];
+
+// 한국시간(KST) 포맷
+const kst = (s: string | null | undefined) =>
+  s ? new Date(s).toLocaleString("ko-KR", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }) : "―";
 
 /** 시스템 관리자 페이지 — 사용자 관리(관리자 토글) + 회원가입자 프로젝트 배정 */
 export default function AdminPage() {
@@ -21,6 +25,7 @@ export default function AdminPage() {
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [meId, setMeId] = useState<string | null>(null);
 
   const loadMemberships = useCallback(async (userId: string) => {
     if (!userId) { setMemberships([]); return; }
@@ -45,9 +50,19 @@ export default function AdminPage() {
 
   useEffect(() => { void load(); }, [load]);
   useEffect(() => { void loadMemberships(assign.userId); }, [assign.userId, loadMemberships]);
+  useEffect(() => { supabase.auth.getUser().then(({ data }) => setMeId(data.user?.id ?? null)); }, [supabase]);
 
   async function toggle(u: UserRow) {
     await supabase.rpc("admin_set_user_admin", { p_user_id: u.id, p_is_admin: !u.is_admin });
+    void load();
+  }
+
+  async function removeUser(u: UserRow) {
+    setMsg(null); setErr(null);
+    if (!confirm(`${u.full_name ?? u.email} 사용자를 완전히 삭제할까요?\n계정·프로필·모든 프로젝트 배정이 함께 삭제되며 되돌릴 수 없습니다.`)) return;
+    const { error } = await supabase.rpc("admin_delete_user", { p_user_id: u.id });
+    if (error) { setErr(`삭제 실패: ${error.message}`); return; }
+    setMsg(`${u.full_name ?? u.email} 사용자를 삭제했습니다.`);
     void load();
   }
 
@@ -164,29 +179,44 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* 사용자 목록 + 관리자 토글 */}
+            {/* 사용자 목록 + 관리자 토글 + 로그인 이력 + 삭제 */}
             <div className="panel">
-              <div className="panel-head"><span className="panel-title">전체 사용자 · 시스템 관리자 지정</span></div>
-              <div>
-                {users.map((u) => (
-                  <div key={u.id} className="flex items-center justify-between border-b px-4 py-3 last:border-b-0" style={{ borderColor: "var(--border)" }}>
-                    <div>
-                      <div className="text-[14px] font-semibold" style={{ color: "var(--heading)" }}>{u.full_name ?? u.email}</div>
-                      <div className="text-[12px]" style={{ color: "var(--muted)" }}>{u.email} · 가입 {u.created_at?.slice(0, 10)}</div>
-                    </div>
-                    <button
-                      onClick={() => toggle(u)}
-                      className="rounded-[4px] px-3 py-1.5 text-[13px] font-semibold"
-                      style={u.is_admin
-                        ? { background: "var(--accent)", color: "#fff" }
-                        : { border: "1px solid var(--border-strong)", color: "var(--text)" }}
-                      title="클릭하면 관리자↔일반 전환"
-                    >
-                      {u.is_admin ? "관리자" : "일반"}
-                    </button>
-                  </div>
-                ))}
-                {users.length === 0 && <p className="px-4 py-6 text-[14px]" style={{ color: "var(--muted)" }}>사용자가 없습니다.</p>}
+              <div className="panel-head"><span className="panel-title">전체 사용자 · 시스템 관리자 · 로그인 이력</span><span className="text-[12px]" style={{ color: "var(--faint)" }}>시각: 한국시간(KST)</span></div>
+              <div className="grid-wrap overflow-x-auto" style={{ border: "none", borderRadius: 0, boxShadow: "none" }}>
+                <table className="data-table">
+                  <thead><tr>
+                    <th>사용자</th>
+                    <th style={{ width: 170 }}>가입일(KST)</th>
+                    <th style={{ width: 170 }}>최근 로그인(KST)</th>
+                    <th style={{ width: 90 }}>권한</th>
+                    <th style={{ width: 80 }}>관리</th>
+                  </tr></thead>
+                  <tbody>
+                    {users.map((u) => (
+                      <tr key={u.id}>
+                        <td>
+                          <div className="text-[14px] font-semibold" style={{ color: "var(--heading)" }}>{u.full_name ?? u.email}{u.id === meId && <span className="ml-1 text-[11px]" style={{ color: "var(--faint)" }}>(나)</span>}</div>
+                          <div className="text-[12px]" style={{ color: "var(--muted)" }}>{u.email}</div>
+                        </td>
+                        <td className="num" style={{ color: "var(--muted)" }}>{kst(u.created_at)}</td>
+                        <td className="num" style={{ color: u.last_sign_in_at ? "var(--text)" : "var(--faint)" }}>{u.last_sign_in_at ? kst(u.last_sign_in_at) : "로그인 이력 없음"}</td>
+                        <td>
+                          <button onClick={() => toggle(u)} className="rounded-[4px] px-3 py-1.5 text-[13px] font-semibold"
+                            style={u.is_admin ? { background: "var(--accent)", color: "#fff" } : { border: "1px solid var(--border-strong)", color: "var(--text)" }}
+                            title="클릭하면 관리자↔일반 전환">
+                            {u.is_admin ? "관리자" : "일반"}
+                          </button>
+                        </td>
+                        <td>
+                          {u.id === meId
+                            ? <span className="text-[12px]" style={{ color: "var(--faint)" }}>본인</span>
+                            : <button onClick={() => removeUser(u)} className="btn btn-danger btn-sm">삭제</button>}
+                        </td>
+                      </tr>
+                    ))}
+                    {users.length === 0 && <tr><td colSpan={5} className="px-4 py-6 text-center text-[14px]" style={{ color: "var(--muted)" }}>사용자가 없습니다.</td></tr>}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
