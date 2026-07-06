@@ -3,6 +3,7 @@ import { getProject, getWorkPackages, getEvmSummary, getEvmSnapshots } from "@/l
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { ProjectNav } from "@/components/layout/ProjectNav";
 import { EvmView } from "@/components/evm/EvmView";
+import { EvmHelp } from "@/components/evm/EvmHelp";
 import type { EvmSummary, EvmSnapshot } from "@/lib/db/types";
 
 export default async function EvmPage({ params }: { params: Promise<{ id: string }> }) {
@@ -19,12 +20,16 @@ export default async function EvmPage({ params }: { params: Promise<{ id: string
       <SiteHeader />
       <ProjectNav projectId={id} />
       <div className="page">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="page-head">
           <div>
-            <h1 className="text-xl font-semibold" style={{ color: "var(--navy)" }}>EVM 성과분석</h1>
-            <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>{project.name} · 획득가치 기반 원가·일정 성과 및 완료시점 예측</p>
+            <p className="eyebrow">{project.name}</p>
+            <div className="flex items-center gap-2">
+              <h1 className="page-title">EVM 성과분석</h1>
+              <EvmHelp />
+            </div>
+            <p className="page-sub">획득가치 기반 원가·일정 성과 및 완료시점 예측</p>
           </div>
-          <Link href={`/projects/${id}/board`} className="text-sm" style={{ color: "var(--accent)" }}>← 대시보드</Link>
+          <Link href={`/projects/${id}/board`} className="link text-[14px]">← 대시보드</Link>
         </div>
         <EvmView
           projectId={id}
