@@ -1,15 +1,7 @@
 import Link from "next/link";
 import { getMyProjects } from "@/lib/db/queries";
 import { SiteHeader } from "@/components/layout/SiteHeader";
-
-const STATUS: Record<string, { label: string; cls: string }> = {
-  planning: { label: "계획", cls: "badge-neutral" },
-  in_progress: { label: "진행", cls: "badge-info" },
-  active: { label: "진행", cls: "badge-info" },
-  on_hold: { label: "보류", cls: "badge-warn" },
-  completed: { label: "완료", cls: "badge-ok" },
-  cancelled: { label: "취소", cls: "badge-danger" },
-};
+import { ProjectExplorer, type ProjectItem } from "@/components/projects/ProjectExplorer";
 
 export default async function HomePage() {
   const projects = await getMyProjects();
@@ -36,42 +28,7 @@ export default async function HomePage() {
             <p className="text-[13px]" style={{ color: "var(--muted)" }}>‘신규 수주 등록’ 또는 ‘도면으로 수주 생성’으로 시작하세요.</p>
           </div>
         ) : (
-          <div className="grid-wrap">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th style={{ width: 40 }}>#</th>
-                  <th>프로젝트</th>
-                  <th>발주처 / 최종수요처</th>
-                  <th style={{ width: 90 }}>상태</th>
-                  <th style={{ width: 40 }}></th>
-                </tr>
-              </thead>
-              <tbody>
-                {projects.map((p, i) => {
-                  const s = STATUS[p.status as string] ?? { label: p.status, cls: "badge-neutral" };
-                  return (
-                    <tr key={p.id} className="group">
-                      <td className="num" style={{ color: "var(--faint)" }}>{i + 1}</td>
-                      <td>
-                        <Link href={`/projects/${p.id}/board`} className="flex items-center gap-2 font-semibold" style={{ color: "var(--heading)" }}>
-                          <span className="text-[15px] leading-none">{p.icon}</span>
-                          <span className="hover:underline">{p.name}</span>
-                        </Link>
-                      </td>
-                      <td style={{ color: "var(--muted)" }}>
-                        {p.client_name ?? "발주처 미지정"}{p.end_user ? ` · ${p.end_user}` : ""}
-                      </td>
-                      <td><span className={`badge ${s.cls}`}>{s.label}</span></td>
-                      <td className="text-right">
-                        <Link href={`/projects/${p.id}/board`} className="link text-[13px]">열기 →</Link>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <ProjectExplorer projects={(projects as unknown as ProjectItem[])} />
         )}
       </div>
     </main>
