@@ -14,6 +14,19 @@ interface InitialData {
   procurement: unknown;
 }
 
+export interface ProjectInfo {
+  name: string;
+  client_name: string | null;
+  end_user: string | null;
+  status: string;
+  contract_amount: number | null;
+  start_date: string | null;
+  end_date: string | null;
+  delivery_date: string | null;
+  retention_rate: number | null;
+  description: string | null;
+}
+
 /**
  * 대시보드 + AI 패널 클라이언트 래퍼.
  * AI 명령이 데이터를 바꾸면 onChange로 Supabase에서 즉시 재조회해
@@ -22,10 +35,12 @@ interface InitialData {
 export function SiteView({
   projectId,
   contractAmount,
+  info,
   initial,
 }: {
   projectId: string;
   contractAmount: number | null;
+  info: ProjectInfo;
   initial: InitialData;
 }) {
   const supabase = createClient();
@@ -59,6 +74,7 @@ export function SiteView({
         cost={cost as never}
         procurement={procurement as never}
         contractAmount={contractAmount}
+        info={info}
       />
       <ChatPanel projectId={projectId} onChange={refresh} />
     </div>

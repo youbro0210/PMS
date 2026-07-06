@@ -42,6 +42,18 @@ export default async function SitePage({ params }: { params: Promise<{ id: strin
       <SiteView
         projectId={id}
         contractAmount={project.contract_amount}
+        info={{
+          name: project.name,
+          client_name: project.client_name ?? null,
+          end_user: project.end_user ?? null,
+          status: project.status,
+          contract_amount: project.contract_amount ?? null,
+          start_date: project.start_date ?? null,
+          end_date: project.end_date ?? null,
+          delivery_date: project.delivery_date ?? null,
+          retention_rate: project.retention_rate ?? null,
+          description: project.description ?? null,
+        }}
         initial={{ works, progress, billing, cost, procurement }}
       />
     </main>

@@ -16,6 +16,28 @@ const WORK_STATUS: Record<string, string> = {
  * 수주 프로젝트 대시보드 — 단계 진척 · 대금 · 원가 · 기자재 구매 핵심 지표 + 단계별 진행.
  * 수치는 모두 서버(집계 뷰)에서 전달받는다.
  */
+const STATUS_LABEL: Record<string, { label: string; cls: string }> = {
+  planning: { label: "계획", cls: "badge-neutral" },
+  active: { label: "진행", cls: "badge-info" },
+  in_progress: { label: "진행", cls: "badge-info" },
+  on_hold: { label: "보류", cls: "badge-warn" },
+  completed: { label: "완료", cls: "badge-ok" },
+  cancelled: { label: "취소", cls: "badge-danger" },
+};
+
+function fmtDate(d: string | null) { return d ?? "-"; }
+function monthsBetween(a: string | null, b: string | null) {
+  if (!a || !b) return null;
+  const s = new Date(a).getTime(), e = new Date(b).getTime();
+  if (Number.isNaN(s) || Number.isNaN(e) || e < s) return null;
+  return Math.round(((e - s) / (1000 * 60 * 60 * 24 * 30.44)) * 10) / 10;
+}
+function daysTo(d: string | null) {
+  if (!d) return null;
+  const t = new Date(d).getTime(); if (Number.isNaN(t)) return null;
+  return Math.ceil((t - Date.now()) / (1000 * 60 * 60 * 24));
+}
+
 export function SiteDashboard({
   works,
   progress,
@@ -23,6 +45,7 @@ export function SiteDashboard({
   cost,
   procurement,
   contractAmount,
+  info,
 }: {
   works: WorkPackage[];
   progress: ProgressRow | null;
@@ -30,9 +53,44 @@ export function SiteDashboard({
   cost: CostRow | null;
   procurement: ProcRow | null;
   contractAmount: number | null;
+  info?: {
+    name: string; client_name: string | null; end_user: string | null; status: string;
+    contract_amount: number | null; start_date: string | null; end_date: string | null;
+    delivery_date: string | null; retention_rate: number | null; description: string | null;
+  };
 }) {
+  const end = info?.delivery_date ?? info?.end_date ?? null;
+  const dur = monthsBetween(info?.start_date ?? null, end);
+  const dday = daysTo(info?.delivery_date ?? info?.end_date ?? null);
+  const st = info ? (STATUS_LABEL[info.status] ?? { label: info.status, cls: "badge-neutral" }) : null;
   return (
     <div className="min-h-0 flex-1 space-y-6 p-4 sm:p-6 overflow-visible lg:overflow-y-auto">
+      {info && (
+        <section className="panel">
+          <div className="panel-head">
+            <span className="panel-title">수주 정보</span>
+            {st && <span className={`badge ${st.cls}`}>{st.label}</span>}
+          </div>
+          <div className="panel-body grid grid-cols-2 gap-x-6 gap-y-4 lg:grid-cols-4">
+            <Info label="발주처" value={info.client_name ?? "미지정"} />
+            <Info label="최종 수요처" value={info.end_user ?? "미지정"} />
+            <Info label="계약금액" value={won(info.contract_amount)} strong />
+            <Info label="실행예산(BAC)" value={won(cost?.budget_total ?? null)} />
+            <Info label="착수일" value={fmtDate(info.start_date)} />
+            <Info label="납기일" value={fmtDate(info.delivery_date ?? info.end_date)} />
+            <Info label="전체 기간" value={dur != null ? `${dur}개월` : "-"} />
+            <Info label="납기까지" value={dday == null ? "-" : dday >= 0 ? `D-${dday}` : `D+${-dday} (경과)`}
+              valueColor={dday != null && dday < 0 ? "var(--danger)" : undefined} />
+            {info.retention_rate != null && <Info label="유보율" value={`${info.retention_rate}%`} />}
+          </div>
+          {/* 전체 일정 바 */}
+          {info.start_date && end && (
+            <div className="px-4 pb-4">
+              <ScheduleBar start={info.start_date} end={end} />
+            </div>
+          )}
+        </section>
+      )}
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Metric label="단계 진척 (실적 / 계획)" value={`${progress?.actual_progress ?? 0}% / ${progress?.planned_progress ?? 0}%`}
           sub={progress?.variance != null ? (progress.variance >= 0 ? `+${progress.variance}%p 선행` : `${progress.variance}%p 지연`) : ""}
@@ -91,6 +149,42 @@ export function SiteDashboard({
           ))}
         </div>
       </section>
+    </div>
+  );
+}
+
+function Info({ label, value, strong, valueColor }: { label: string; value: string; strong?: boolean; valueColor?: string }) {
+  return (
+    <div>
+      <div className="text-[12px]" style={{ color: "var(--muted)" }}>{label}</div>
+      <div className={`mt-0.5 ${strong ? "text-[17px] font-bold" : "text-[15px] font-semibold"}`} style={{ color: valueColor ?? "var(--heading)", fontVariantNumeric: "tabular-nums" }}>{value}</div>
+    </div>
+  );
+}
+
+function ScheduleBar({ start, end }: { start: string; end: string }) {
+  const s = new Date(start).getTime(), e = new Date(end).getTime(), now = Date.now();
+  const span = e - s;
+  const frac = span > 0 ? Math.min(1, Math.max(0, (now - s) / span)) : 0;
+  const pct = Math.round(frac * 100);
+  const before = now < s, after = now > e;
+  return (
+    <div>
+      <div className="mb-1 flex items-center justify-between text-[11px]" style={{ color: "var(--faint)" }}>
+        <span>착수 {start}</span>
+        <span>납기 {end}</span>
+      </div>
+      <div className="relative h-2.5 rounded-full" style={{ background: "var(--surface-3)" }}>
+        <div className="absolute left-0 top-0 h-2.5 rounded-full" style={{ width: `${pct}%`, background: after ? "var(--danger)" : "var(--accent)" }} />
+        {!before && !after && (
+          <div className="absolute -top-1 flex flex-col items-center" style={{ left: `calc(${pct}% - 1px)` }}>
+            <div style={{ width: 2, height: 18, background: "var(--navy)" }} />
+          </div>
+        )}
+      </div>
+      <div className="mt-1 text-[11px]" style={{ color: "var(--muted)" }}>
+        {before ? "착수 전" : after ? "납기 경과" : `일정 경과 ${pct}% · 오늘`}
+      </div>
     </div>
   );
 }
