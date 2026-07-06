@@ -47,6 +47,8 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // 정적 자산·이미지 제외 전 경로
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+  // 정적 자산·PWA 공개 파일(매니페스트·서비스워커·아이콘·asset-links) 제외 전 경로
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|manifest\\.webmanifest|sw\\.js|\\.well-known|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+  ],
 };
