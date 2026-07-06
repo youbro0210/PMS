@@ -77,7 +77,7 @@ export function ChatPanel({ projectId, onChange }: { projectId: string; onChange
   }
 
   return (
-    <aside className="flex h-[70vh] w-full flex-shrink-0 flex-col border-t lg:h-auto lg:w-96 lg:border-l lg:border-t-0" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+    <aside className="flex w-full flex-shrink-0 flex-col border-t lg:h-auto lg:w-96 lg:border-l lg:border-t-0" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
       <div className="flex items-center justify-between border-b px-4 py-3" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
         <span className="text-[15px] font-bold" style={{ color: "var(--heading)" }}>AI 어시스턴트</span>
         {messages.length > 0 && (
@@ -91,7 +91,7 @@ export function ChatPanel({ projectId, onChange }: { projectId: string; onChange
         )}
       </div>
 
-      <div className="flex-1 space-y-3 overflow-y-auto p-4">
+      <div className="flex-1 space-y-3 overflow-y-auto p-4 max-h-[55vh] lg:max-h-none">
         {messages.length === 0 && (
           <div className="rounded-[6px] border px-3 py-3 text-[14px] leading-relaxed" style={{ borderColor: "var(--border)", background: "var(--surface-2)", color: "var(--muted)" }}>
             <p className="mb-1 font-semibold" style={{ color: "var(--heading)" }}>이렇게 명령해 보세요</p>

@@ -51,7 +51,7 @@ export function SiteView({
   }, [supabase, projectId]);
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden lg:flex-row">
+    <div className="flex flex-1 flex-col overflow-visible lg:flex-row lg:overflow-hidden">
       <SiteDashboard
         works={works}
         progress={progress as never}

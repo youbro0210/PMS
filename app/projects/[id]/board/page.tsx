@@ -22,7 +22,7 @@ export default async function SitePage({ params }: { params: Promise<{ id: strin
   ]);
 
   return (
-    <main className="flex h-screen flex-col">
+    <main className="flex min-h-screen flex-col lg:h-screen">
       <header className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b p-3 sm:p-4" style={{ borderColor: "var(--border)" }}>
         <Link href="/portfolio" className="rounded-md px-3 py-1.5 text-xs font-medium text-white sm:text-sm" style={{ background: "var(--accent)" }}>
           전체 수주현황

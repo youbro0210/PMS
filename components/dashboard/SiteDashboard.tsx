@@ -32,7 +32,7 @@ export function SiteDashboard({
   contractAmount: number | null;
 }) {
   return (
-    <div className="min-h-0 flex-1 space-y-6 overflow-y-auto p-4 sm:p-6">
+    <div className="min-h-0 flex-1 space-y-6 p-4 sm:p-6 overflow-visible lg:overflow-y-auto">
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Metric label="단계 진척 (실적 / 계획)" value={`${progress?.actual_progress ?? 0}% / ${progress?.planned_progress ?? 0}%`}
           sub={progress?.variance != null ? (progress.variance >= 0 ? `+${progress.variance}%p 선행` : `${progress.variance}%p 지연`) : ""}
