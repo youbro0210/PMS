@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.vercel.pms_five_rosy.twa",
+      "sha256_cert_fingerprints": [
+        "E4:86:1A:83:AB:92:6A:21:8A:1D:94:F8:FD:B6:96:8B:C9:C2:17:02:D6:1C:58:89:E7:5C:54:11:B5:70:69:7D"
+      ]
+    }
+  }
+]
