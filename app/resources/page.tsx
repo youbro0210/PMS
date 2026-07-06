@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { formatThousands } from "@/lib/format";
@@ -39,14 +39,24 @@ export default function ResourcesPage() {
   const [err, setErr] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
   const [form, setForm] = useState({ employee_no: "", name: "", rank: "", department: "", trade: "", monthly_rate: "", capacity_pct: "100" });
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [detail, setDetail] = useState<Record<string, { project: string; alloc: number; sd: string | null; ed: string | null; active: boolean }[]>>({});
 
   const load = useCallback(async () => {
-    const [{ data: rs }, { data: us }] = await Promise.all([
+    const [{ data: rs }, { data: us }, { data: asg }] = await Promise.all([
       supabase.from("resources").select("*").order("is_active", { ascending: false }).order("employee_no", { nullsFirst: false }),
       supabase.from("resource_utilization").select("*"),
+      supabase.from("project_assignments").select("resource_id, allocation_pct, start_date, end_date, role, projects(name)"),
     ]);
     setRows((rs as Resource[]) ?? []);
     setUtil(Object.fromEntries(((us as ResourceUtilization[]) ?? []).map((u) => [u.resource_id, u])));
+    const today = new Date().toISOString().slice(0, 10);
+    const grp: Record<string, { project: string; alloc: number; sd: string | null; ed: string | null; active: boolean }[]> = {};
+    for (const a of (asg as unknown as { resource_id: string; allocation_pct: number; start_date: string | null; end_date: string | null; projects: { name: string } | null }[]) ?? []) {
+      const active = (!a.start_date || a.start_date <= today) && (!a.end_date || a.end_date >= today);
+      (grp[a.resource_id] ??= []).push({ project: a.projects?.name ?? "(프로젝트)", alloc: a.allocation_pct, sd: a.start_date, ed: a.end_date, active });
+    }
+    setDetail(grp);
   }, [supabase]);
   useEffect(() => { void load(); }, [load]);
 
@@ -143,7 +153,7 @@ export default function ResourcesPage() {
           <div>
             <p className="eyebrow">전사 인력 풀</p>
             <h1 className="page-title">인력 관리</h1>
-            <p className="page-sub">사번·직급·부서·월단가를 등록하고, 프로젝트별 인력 화면에서 배정합니다. 배정률 합이 가동률을 넘으면 과배정으로 표시됩니다.</p>
+            <p className="page-sub">사번·직급·부서·월단가를 등록하고, 프로젝트별 인력 화면에서 배정합니다. <b>현재 배정률</b>을 클릭하면 어느 프로젝트에 몇 % 배정됐는지(과배정 사유)가 펼쳐집니다.</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <button onClick={downloadTemplate} className="btn btn-secondary btn-sm">엑셀 양식 다운로드</button>
@@ -184,8 +194,11 @@ export default function ResourcesPage() {
               {rows.map((r) => {
                 const u = util[r.id];
                 const over = u && u.current_allocation_pct > r.capacity_pct;
+                const list = detail[r.id] ?? [];
+                const open = openId === r.id;
                 return (
-                  <tr key={r.id}>
+                  <Fragment key={r.id}>
+                  <tr>
                     <td><input className="input input-sm w-20" value={r.employee_no ?? ""} onChange={(e) => patch(r, "employee_no", e.target.value)} /></td>
                     <td><input className="input input-sm w-24 font-medium" value={r.name} onChange={(e) => patch(r, "name", e.target.value)} /></td>
                     <td><input className="input input-sm w-16" value={r.rank ?? ""} onChange={(e) => patch(r, "rank", e.target.value)} /></td>
@@ -193,13 +206,45 @@ export default function ResourcesPage() {
                     <td><input className="input input-sm w-20" value={r.trade ?? ""} onChange={(e) => patch(r, "trade", e.target.value)} /></td>
                     <td><input className="input input-sm w-28 text-right" inputMode="numeric" value={formatThousands(String(r.monthly_rate))} onChange={(e) => patch(r, "monthly_rate", Number(e.target.value.replace(/,/g, "")) || 0)} /></td>
                     <td><input className="input input-sm w-14 text-right" inputMode="numeric" value={r.capacity_pct} onChange={(e) => patch(r, "capacity_pct", Number(e.target.value) || 0)} /></td>
-                    <td className="num font-medium" style={{ color: over ? "var(--danger)" : "var(--text)" }}>{u?.current_allocation_pct ?? 0}%{over ? " 과배정" : ""}</td>
+                    <td className="num font-medium">
+                      <button onClick={() => setOpenId(open ? null : r.id)} className="inline-flex items-center gap-1 hover:underline" style={{ color: over ? "var(--danger)" : "var(--text)" }} title="배정 내역(사유) 보기">
+                        {u?.current_allocation_pct ?? 0}%{over ? " 과배정" : ""}
+                        <span style={{ fontSize: 10, color: "var(--faint)" }}>{open ? "▲" : "▾"}</span>
+                      </button>
+                    </td>
                     <td className="text-center"><input type="checkbox" checked={r.is_active} onChange={(e) => patch(r, "is_active", e.target.checked)} /></td>
                     <td className="whitespace-nowrap">
                       <button onClick={() => save(r)} className="btn btn-secondary btn-sm mr-1">저장</button>
                       <button onClick={() => remove(r)} className="btn btn-danger btn-sm">삭제</button>
                     </td>
                   </tr>
+                  {open && (
+                    <tr>
+                      <td colSpan={10} style={{ background: "var(--surface-2)" }}>
+                        <div className="px-2 py-1">
+                          <div className="mb-1 text-[12px] font-bold" style={{ color: over ? "var(--danger)" : "var(--heading)" }}>
+                            {over ? `과배정 사유 — 현재 배정 합 ${u?.current_allocation_pct}% (가동률 ${r.capacity_pct}% 초과)` : "배정 내역"}
+                          </div>
+                          {list.length === 0 ? (
+                            <div className="text-[13px]" style={{ color: "var(--muted)" }}>배정된 프로젝트가 없습니다.</div>
+                          ) : (
+                            <ul className="space-y-0.5">
+                              {list.sort((a, b) => Number(b.active) - Number(a.active)).map((a, idx) => (
+                                <li key={idx} className="flex flex-wrap items-center gap-x-3 text-[13px]">
+                                  <span className={`badge ${a.active ? "badge-info" : "badge-neutral"}`}>{a.active ? "진행중" : "기간외"}</span>
+                                  <span className="font-semibold" style={{ color: "var(--heading)" }}>{a.project}</span>
+                                  <span className="num" style={{ color: a.active && over ? "var(--danger)" : "var(--text)" }}>배정 {a.alloc}%</span>
+                                  <span style={{ color: "var(--faint)" }}>{a.sd ?? "-"} ~ {a.ed ?? "-"}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          {over && <p className="mt-1 text-[12px]" style={{ color: "var(--muted)" }}>‘진행중’ 배정의 합이 가동률을 초과했습니다. 배정%를 조정하거나 기간을 겹치지 않게 하세요.</p>}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                  </Fragment>
                 );
               })}
               {rows.length === 0 && <tr><td colSpan={10} className="px-3 py-8 text-center" style={{ color: "var(--muted)" }}>등록된 인력이 없습니다. ‘엑셀 양식 다운로드’로 양식을 받아 작성 후 ‘엑셀 업로드’ 하거나, 위에서 직접 추가하세요.</td></tr>}
