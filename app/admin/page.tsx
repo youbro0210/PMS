@@ -17,9 +17,20 @@ export default function AdminPage() {
   const [projects, setProjects] = useState<ProjectRow[]>([]);
   const [allowed, setAllowed] = useState<boolean | null>(null);
   const [assign, setAssign] = useState({ userId: "", projectId: "", role: "developer" as MemberRole });
+  const [memberships, setMemberships] = useState<{ id: string; project_id: string; project_name: string; role: MemberRole }[]>([]);
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  const loadMemberships = useCallback(async (userId: string) => {
+    if (!userId) { setMemberships([]); return; }
+    const { data } = await supabase
+      .from("project_members")
+      .select("id, role, project_id, projects(name)")
+      .eq("user_id", userId);
+    setMemberships(((data as unknown as { id: string; role: MemberRole; project_id: string; projects: { name: string } | null }[]) ?? [])
+      .map((m) => ({ id: m.id, project_id: m.project_id, project_name: m.projects?.name ?? "(프로젝트)", role: m.role })));
+  }, [supabase]);
 
   const load = useCallback(async () => {
     const { data, error } = await supabase.rpc("admin_list_users");
@@ -33,6 +44,7 @@ export default function AdminPage() {
   }, [supabase]);
 
   useEffect(() => { void load(); }, [load]);
+  useEffect(() => { void loadMemberships(assign.userId); }, [assign.userId, loadMemberships]);
 
   async function toggle(u: UserRow) {
     await supabase.rpc("admin_set_user_admin", { p_user_id: u.id, p_is_admin: !u.is_admin });
@@ -49,6 +61,21 @@ export default function AdminPage() {
     if (error) { setErr(`배정 실패: ${error.message}`); return; }
     const pj = projects.find((p) => p.id === assign.projectId);
     setMsg(`${user.full_name ?? user.email} 님을 ‘${pj?.name}’에 ${ROLE_LABELS[assign.role]}(으)로 배정했습니다.`);
+    void loadMemberships(assign.userId);
+  }
+
+  async function changeMembershipRole(id: string, role: MemberRole) {
+    setMemberships((p) => p.map((m) => (m.id === id ? { ...m, role } : m)));
+    const { error } = await supabase.from("project_members").update({ role }).eq("id", id);
+    if (error) { setErr(`역할 변경 실패: ${error.message}`); void loadMemberships(assign.userId); return; }
+    setMsg("역할을 변경했습니다.");
+  }
+  async function removeMembership(id: string, projectName: string) {
+    if (!confirm(`이 사용자의 ‘${projectName}’ 배정을 삭제할까요?`)) return;
+    const { error } = await supabase.from("project_members").delete().eq("id", id);
+    if (error) { setErr(`삭제 실패: ${error.message}`); return; }
+    setMsg(`‘${projectName}’ 배정을 삭제했습니다.`);
+    void loadMemberships(assign.userId);
   }
 
   return (
@@ -95,7 +122,45 @@ export default function AdminPage() {
                 </div>
                 {msg && <p className="mt-3 rounded-[4px] px-3 py-2 text-[13px]" style={{ background: "var(--ok-soft)", color: "var(--ok)" }}>{msg}</p>}
                 {err && <p className="mt-3 rounded-[4px] px-3 py-2 text-[13px]" style={{ background: "var(--danger-soft)", color: "var(--danger)" }}>{err}</p>}
-                <p className="mt-3 text-[12px]" style={{ color: "var(--faint)" }}>배정하려는 사용자는 먼저 회원가입돼 있어야 합니다. 프로젝트 내 세부 역할 변경·삭제는 각 프로젝트의 <b>멤버</b> 탭에서도 가능합니다.</p>
+
+                {/* 선택 사용자의 현재 배정(중복 포함) — 수정·삭제 */}
+                <div className="mt-4">
+                  <div className="mb-2 text-[13px] font-bold" style={{ color: "var(--heading)" }}>
+                    {(users.find((u) => u.id === assign.userId)?.full_name) ?? "선택 사용자"} 님의 현재 배정 · {memberships.length}건
+                  </div>
+                  {memberships.length === 0 ? (
+                    <p className="text-[13px]" style={{ color: "var(--muted)" }}>아직 배정된 프로젝트가 없습니다. 위에서 배정하세요. (한 사람을 여러 프로젝트에 중복 배정할 수 있습니다.)</p>
+                  ) : (
+                    <div className="grid-wrap overflow-x-auto">
+                      <table className="data-table">
+                        <thead><tr><th>프로젝트</th><th style={{ width: 160 }}>역할(권한)</th><th style={{ width: 90 }}>관리</th></tr></thead>
+                        <tbody>
+                          {memberships.map((m) => (
+                            <tr key={m.id}>
+                              <td className="font-semibold" style={{ color: "var(--heading)" }}>{m.project_name}</td>
+                              <td>
+                                {m.role === "owner" ? (
+                                  <span className="badge badge-info">{ROLE_LABELS.owner}</span>
+                                ) : (
+                                  <select className="select input-sm w-36" value={m.role} onChange={(e) => changeMembershipRole(m.id, e.target.value as MemberRole)}>
+                                    {ASSIGN_ROLES.map((r) => <option key={r} value={r}>{ROLE_LABELS[r]}</option>)}
+                                  </select>
+                                )}
+                              </td>
+                              <td>
+                                {m.role === "owner"
+                                  ? <span className="text-[12px]" style={{ color: "var(--faint)" }}>소유자</span>
+                                  : <button onClick={() => removeMembership(m.id, m.project_name)} className="btn btn-danger btn-sm">삭제</button>}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
+                <p className="mt-3 text-[12px]" style={{ color: "var(--faint)" }}>배정하려는 사용자는 먼저 회원가입돼 있어야 합니다. 한 사람을 여러 프로젝트에 중복 배정할 수 있고, 위 목록에서 역할 변경·삭제가 가능합니다. (소유자 권한은 각 프로젝트의 <b>멤버</b> 탭에서 관리)</p>
               </div>
             </div>
 
