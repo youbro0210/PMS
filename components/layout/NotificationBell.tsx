@@ -68,7 +68,7 @@ export function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 z-20 mt-2 w-80 overflow-hidden rounded-[6px] border shadow-lg" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+        <div className="absolute right-0 z-20 mt-2 w-[min(20rem,calc(100vw-1.5rem))] overflow-hidden rounded-[6px] border shadow-lg" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
           <div className="flex items-center justify-between border-b px-3 py-2 text-sm font-medium" style={{ borderColor: "var(--border)", color: "var(--navy)" }}>
             알림
             {unread > 0 && <button onClick={markAllRead} className="text-xs" style={{ color: "var(--accent)" }}>모두 읽음</button>}

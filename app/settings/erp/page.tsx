@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { SettingsTabs } from "@/components/layout/SettingsTabs";
 
 interface OutboxRow { id: string; entity: string; op: string; status: string; erp_doc_no: string | null; error: string | null }
 interface Mapping { id: string; kind: string; pms_id: string; erp_code: string }
@@ -94,10 +95,7 @@ export default function ErpSettingsPage() {
           <Link href="/" className="link text-[14px]">← 홈</Link>
         </div>
 
-        <div className="mb-4 flex items-center gap-1">
-          <Link href="/settings/erp" className="tab" data-active={true}>ERP 연동</Link>
-          <Link href="/settings/projects" className="tab" data-active={false}>수주 관리</Link>
-        </div>
+        <SettingsTabs active="erp" />
 
         {allowed === false && <p className="text-sm" style={{ color: "var(--muted)" }}>시스템 관리자만 접근할 수 있습니다.</p>}
 

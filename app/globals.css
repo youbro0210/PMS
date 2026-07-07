@@ -45,6 +45,45 @@
   --ring:0 0 0 3px rgba(36,90,176,.18);
 }
 
+/* ============================================================
+   다크 테마 — html[data-theme="dark"] 에서 토큰만 재정의
+   (컴포넌트는 CSS 변수를 쓰므로 대부분 자동 적용)
+   ============================================================ */
+:root[data-theme="dark"]{
+  color-scheme:dark;
+
+  --background:#0e131b;
+  --surface:#161d28;
+  --surface-2:#1b2330;
+  --surface-3:#212b3a;
+
+  --border:#2a3444;
+  --border-strong:#3a4658;
+
+  --text:#e5eaf1;
+  --heading:#f3f6fb;
+  --muted:#9aa6b8;
+  --faint:#6f7c90;
+
+  --navy:#0c1424;            /* 상단바 */
+  --accent:#4f8bec;          /* 다크 대비용 밝은 스틸블루 */
+  --accent-hover:#6a9ef0;
+  --accent-soft:#182742;
+  --accent-line:#294066;
+
+  --ok:#3fbf87;   --ok-soft:#122720;
+  --warn:#e0a53a; --warn-soft:#2a2113;
+  --danger:#e5635b; --danger-soft:#2c1717;
+  --info:#4f8bec; --info-soft:#182742;
+
+  --shadow-sm:0 1px 2px rgba(0,0,0,.35);
+  --shadow:0 1px 3px rgba(0,0,0,.45), 0 1px 2px rgba(0,0,0,.4);
+  --shadow-md:0 6px 18px rgba(0,0,0,.5);
+  --ring:0 0 0 3px rgba(79,139,236,.28);
+}
+:root[data-theme="dark"] *::-webkit-scrollbar-thumb{background:#3a4658;background-clip:content-box}
+:root[data-theme="dark"] *::-webkit-scrollbar-thumb:hover{background:#4a586c;background-clip:content-box}
+
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
@@ -159,9 +198,19 @@ body{
 
   /* ---------- 상단바 / 탭 ---------- */
   .app-topbar{
-    @apply flex items-center justify-between gap-6 px-6 sm:px-8;
-    height:58px; background:var(--navy); color:#fff;
+    @apply flex items-center justify-between gap-3 sm:gap-6;
+    min-height:58px; background:var(--navy); color:#fff;
     border-bottom:1px solid rgba(255,255,255,.08);
+    /* 노치/상태바 아래로 내용(알림 등)이 가려지지 않도록 세이프에어리어 반영 */
+    padding-top:env(safe-area-inset-top);
+    padding-left:max(1rem, env(safe-area-inset-left));
+    padding-right:max(1rem, env(safe-area-inset-right));
+  }
+  @media (min-width:640px){
+    .app-topbar{
+      padding-left:max(2rem, env(safe-area-inset-left));
+      padding-right:max(2rem, env(safe-area-inset-right));
+    }
   }
   .topnav-link{ @apply text-[14px] font-medium; color:rgba(255,255,255,.72); }
   .topnav-link:hover{ color:#fff; }

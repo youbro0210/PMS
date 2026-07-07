@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { FloatingLogout } from "@/components/layout/FloatingLogout";
 import { RegisterSW } from "@/components/pwa/RegisterSW";
 
 export const metadata: Metadata = {
@@ -25,12 +24,16 @@ export const viewport: Viewport = {
   themeColor: "#16244a",
 };
 
+const THEME_INIT = `(function(){try{var t=localStorage.getItem('pms-theme')||'system';var m=window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches;var d=t==='dark'||(t==='system'&&m);document.documentElement.setAttribute('data-theme',d?'dark':'light');}catch(e){}})();`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
+      </head>
       <body>
         {children}
-        <FloatingLogout />
         <RegisterSW />
       </body>
     </html>

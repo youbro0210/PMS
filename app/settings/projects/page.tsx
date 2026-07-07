@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { SettingsTabs } from "@/components/layout/SettingsTabs";
 
 interface Row { id: string; name: string; client_name: string | null; status: string; icon: string | null }
 
@@ -58,10 +59,7 @@ export default function ProjectSettingsPage() {
           <Link href="/" className="link text-[14px]">← 홈</Link>
         </div>
 
-        <div className="mb-4 flex items-center gap-1">
-          <Link href="/settings/erp" className="tab" data-active={false}>ERP 연동</Link>
-          <Link href="/settings/projects" className="tab" data-active={true}>수주 관리</Link>
-        </div>
+        <SettingsTabs active="projects" />
 
         {msg && <p className="mb-3 rounded-[4px] px-3 py-2 text-[13px]" style={{ background: "var(--ok-soft)", color: "var(--ok)" }}>{msg}</p>}
         {err && <p className="mb-3 rounded-[4px] px-3 py-2 text-[13px]" style={{ background: "var(--danger-soft)", color: "var(--danger)" }}>{err}</p>}
